@@ -10,6 +10,7 @@ import Coursepage from './pages/Landing/Coursepage';
 import Registerpage from './pages/Landing/Registerpage';
 
 // Auth Pages (to be created)
+import SignInpage from './components/auth/SignInpage';
 
 
 // Role-based dashboards (to be created)
@@ -30,6 +31,7 @@ function App() {
         <Route path="/register" element={<Registerpage />} />
         
         {/* Auth Pages */}
+        <Route path="/login" element={<SignInpage />} />
       
         
         {/* Protected Routes - To be added after signup */}

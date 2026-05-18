@@ -9,6 +9,7 @@ const Registerpage = () => {
   const [paymentSlip, setPaymentSlip] = useState(null);
   const [paymentSlipPreview, setPaymentSlipPreview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -44,51 +45,134 @@ const Registerpage = () => {
     }
   ];
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Program validation
+    if (!selectedProgram) {
+      newErrors.program = 'Please select a program';
+    }
+
+    // Personal Information validation
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Full name is required';
+    } else if (formData.fullName.trim().length < 3) {
+      newErrors.fullName = 'Name must be at least 3 characters';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+      newErrors.phone = 'Please enter a valid 10-digit phone number';
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address = 'Address is required';
+    }
+
+    // Educational Information validation
+    if (!formData.nic.trim()) {
+      newErrors.nic = 'NIC number is required';
+    } else if (formData.nic.trim().length < 5) {
+      newErrors.nic = 'Please enter a valid NIC number';
+    }
+
+    if (!formData.qualification) {
+      newErrors.qualification = 'Please select your highest qualification';
+    }
+
+    // Payment Information validation
+    if (!formData.transactionId.trim()) {
+      newErrors.transactionId = 'Transaction ID is required';
+    }
+
+    if (!paymentSlip) {
+      newErrors.paymentSlip = 'Please upload the payment slip';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleProgramSelect = (programId) => {
     setSelectedProgram(programId);
     setFormData({ ...formData, program: programId });
+    if (errors.program) {
+      setErrors({ ...errors, program: '' });
+    }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a valid file (JPG, PNG, or PDF)');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+      
       setPaymentSlip(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPaymentSlipPreview(reader.result);
       };
       reader.readAsDataURL(file);
+      
+      if (errors.paymentSlip) {
+        setErrors({ ...errors, paymentSlip: '' });
+      }
     }
   };
 
+  const handleRemoveFile = () => {
+    setPaymentSlip(null);
+    setPaymentSlipPreview('');
+    // Reset the file input
+    const fileInput = document.getElementById('paymentSlip');
+    if (fileInput) fileInput.value = '';
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    // Clear error for this field if it exists
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!selectedProgram) {
-      alert('Please select a program');
-      return;
+    if (validateForm()) {
+      setIsSubmitting(true);
+      
+      // Simulate form submission to backend
+      setTimeout(() => {
+        setIsSubmitting(false);
+        alert('Registration submitted successfully! We will contact you within 24 hours.');
+        navigate('/');
+      }, 2000);
+    } else {
+      // Scroll to top to show errors
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    
-    if (!paymentSlip) {
-      alert('Please upload the payment slip');
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert('Registration submitted successfully! We will contact you within 24 hours.');
-      navigate('/');
-    }, 2000);
   };
 
   return (
@@ -128,6 +212,23 @@ const Registerpage = () => {
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           
+          {/* Error Summary */}
+          {Object.keys(errors).length > 0 && (
+            <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-red-500 text-lg">⚠️</span>
+                <div>
+                  <h4 className="font-semibold text-red-700 text-sm">Please fix the following errors:</h4>
+                  <ul className="list-disc list-inside mt-1 text-red-600 text-xs">
+                    {Object.values(errors).map((error, idx) => (
+                      <li key={idx}>{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Program Selection Cards */}
           <div className="mb-10 md:mb-12">
             <h2 className="text-xl md:text-2xl font-bold text-[#0B1F3A] text-center mb-6 md:mb-8">
@@ -175,6 +276,9 @@ const Registerpage = () => {
                 </div>
               ))}
             </div>
+            {errors.program && (
+              <p className="text-red-500 text-xs mt-2 text-center">{errors.program}</p>
+            )}
           </div>
 
           {/* Registration Form */}
@@ -202,10 +306,12 @@ const Registerpage = () => {
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                       placeholder="Enter your full name"
                     />
+                    {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Email Address *</label>
@@ -214,10 +320,12 @@ const Registerpage = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                       placeholder="your@email.com"
                     />
+                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Phone Number *</label>
@@ -226,10 +334,12 @@ const Registerpage = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                       placeholder="076 885 6172"
                     />
+                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1">WhatsApp Number</label>
@@ -249,10 +359,12 @@ const Registerpage = () => {
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        errors.address ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                       placeholder="Your complete address"
                     />
+                    {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                   </div>
                 </div>
               </div>
@@ -271,10 +383,12 @@ const Registerpage = () => {
                       name="nic"
                       value={formData.nic}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        errors.nic ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                       placeholder="Enter your NIC"
                     />
+                    {errors.nic && <p className="text-red-500 text-xs mt-1">{errors.nic}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Highest Qualification *</label>
@@ -282,8 +396,9 @@ const Registerpage = () => {
                       name="qualification"
                       value={formData.qualification}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition bg-white"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition bg-white ${
+                        errors.qualification ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                     >
                       <option value="">Select Qualification</option>
                       <option>Ordinary Level (O/L)</option>
@@ -293,6 +408,7 @@ const Registerpage = () => {
                       <option>Master's Degree</option>
                       <option>Other</option>
                     </select>
+                    {errors.qualification && <p className="text-red-500 text-xs mt-1">{errors.qualification}</p>}
                   </div>
                 </div>
               </div>
@@ -325,7 +441,6 @@ const Registerpage = () => {
                       name="paymentMethod"
                       value={formData.paymentMethod}
                       onChange={handleChange}
-                      required
                       className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition bg-white"
                     >
                       <option value="bank_transfer">Bank Transfer</option>
@@ -339,30 +454,39 @@ const Registerpage = () => {
                       name="transactionId"
                       value={formData.transactionId}
                       onChange={handleChange}
-                      required
-                      className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
+                      className={`w-full p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        errors.transactionId ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                      }`}
                       placeholder="Enter transaction ID"
                     />
+                    {errors.transactionId && <p className="text-red-500 text-xs mt-1">{errors.transactionId}</p>}
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Upload Payment Slip *</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:border-[#D4AF37] transition">
+                  <div className={`border-2 border-dashed rounded-xl p-4 text-center transition ${
+                    errors.paymentSlip ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-[#D4AF37]'
+                  }`}>
                     <input
                       type="file"
                       accept="image/*,.pdf"
                       onChange={handleFileChange}
                       className="hidden"
                       id="paymentSlip"
-                      required
                     />
-                    <label htmlFor="paymentSlip" className="cursor-pointer">
+                    <label htmlFor="paymentSlip" className="cursor-pointer block">
                       {paymentSlipPreview ? (
                         <div className="space-y-2">
                           <img src={paymentSlipPreview} alt="Payment Slip Preview" className="max-h-32 mx-auto rounded-lg" />
                           <p className="text-sm text-green-600">✓ File uploaded successfully</p>
-                          <p className="text-xs text-gray-500">Click to change file</p>
+                          <button 
+                            type="button"
+                            onClick={handleRemoveFile}
+                            className="text-red-500 text-xs hover:underline mt-1"
+                          >
+                            Remove file
+                          </button>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -373,6 +497,7 @@ const Registerpage = () => {
                       )}
                     </label>
                   </div>
+                  {errors.paymentSlip && <p className="text-red-500 text-xs mt-1">{errors.paymentSlip}</p>}
                 </div>
 
                 <div className="mt-4">
