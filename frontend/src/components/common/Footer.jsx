@@ -2,71 +2,192 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const quickLinks = [
+    { name: "Home", path: "/" },
+    { name: "About Lecturer", path: "/about" },
+    { name: "Courses", path: "/courses" },
+    { name: "How to Apply", path: "/how-to-apply" },
+    { name: "Contact Us", path: "/contact" }
+  ];
+
+  const programs = [
+    "Diploma in HRM & Behavioral Psychology",
+    "Diploma in Buddhist Counselling",
+    "Duration: 6 Months",
+    "Mode: Online Learning",
+    "Medium: Sinhala"
+  ];
+
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">PWI</span>
+    <footer className="bg-[#0B1F3A] text-white relative overflow-hidden">
+      {/* Decorative Top Gradient */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+      
+      {/* Decorative Background Elements */}
+      <div className="absolute top-20 right-0 w-64 h-64 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 left-0 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
+          
+          {/* Brand Section */}
+          <div className="text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#C49B2C] rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-[#0B1F3A] font-bold text-lg">PWI</span>
               </div>
               <div>
-                <span className="font-bold text-lg">PWI Psychological</span>
-                <p className="text-sm text-gray-400">Diploma in Psychology</p>
+                <h2 className="font-bold text-lg md:text-xl text-white">PWI Psychological</h2>
+                <p className="text-xs text-[#D4AF37] font-medium tracking-wide">
+                  Professional Diploma Programmes
+                </p>
               </div>
             </div>
-            <p className="text-gray-400 text-sm">
-              Transforming lives through psychological education and professional training.
+
+            <p className="text-gray-300 text-sm leading-relaxed mt-4">
+              Transforming lives through psychology, counselling, HRM, and behavioral education.
             </p>
+
+            {/* Social Icons */}
+            <div className="flex gap-3 mt-5 justify-center sm:justify-start">
+              {[
+                { icon: "📘", label: "Facebook" },
+                { icon: "📸", label: "Instagram" },
+                { icon: "💼", label: "LinkedIn" },
+                { icon: "▶️", label: "YouTube" }
+              ].map((social, idx) => (
+                <a
+                  key={idx}
+                  href="#"
+                  className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-sm hover:bg-[#D4AF37] hover:text-[#0B1F3A] transition-all duration-300 hover:scale-110"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links Section */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-blue-400 transition">Home</Link></li>
-              <li><Link to="/about" className="text-gray-400 hover:text-blue-400 transition">About Us</Link></li>
-              <li><Link to="/how-to-apply" className="text-gray-400 hover:text-blue-400 transition">How to Apply</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-blue-400 transition">Contact</Link></li>
+            <h3 className="text-base md:text-lg font-semibold mb-5 text-[#D4AF37] flex items-center gap-2 justify-center sm:justify-start">
+              <span className="w-1 h-4 bg-[#D4AF37] rounded-full"></span>
+              Quick Links
+            </h3>
+            <ul className="space-y-2.5">
+              {quickLinks.map((link, idx) => (
+                <li key={idx}>
+                  <Link 
+                    to={link.path} 
+                    className="text-gray-300 hover:text-[#D4AF37] transition duration-300 text-sm flex items-center gap-2 justify-center sm:justify-start group"
+                  >
+                    <span className="w-1 h-1 bg-[#D4AF37] rounded-full opacity-0 group-hover:opacity-100 transition"></span>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Program Info */}
+          {/* Program Section */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Program</h3>
-            <ul className="space-y-2">
-              <li className="text-gray-400">Diploma in Psychology</li>
-              <li className="text-gray-400">Duration: 1 Year</li>
-              <li className="text-gray-400">Mode: Online</li>
-              <li className="text-gray-400">Certification: PWI Certified</li>
+            <h3 className="text-base md:text-lg font-semibold mb-5 text-[#D4AF37] flex items-center gap-2 justify-center sm:justify-start">
+              <span className="w-1 h-4 bg-[#D4AF37] rounded-full"></span>
+              Our Programs
+            </h3>
+            <ul className="space-y-2.5">
+              {programs.map((program, idx) => (
+                <li key={idx}>
+                  <span className="text-gray-300 text-sm flex items-center gap-2 justify-center sm:justify-start">
+                    <span className="text-[#D4AF37] text-xs">•</span>
+                    {program}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Section */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Contact Us</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                </svg>
-                <span>info@pwipsychological.com</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                <span>+94 77 123 4567</span>
-              </li>
-            </ul>
+            <h3 className="text-base md:text-lg font-semibold mb-5 text-[#D4AF37] flex items-center gap-2 justify-center sm:justify-start">
+              <span className="w-1 h-4 bg-[#D4AF37] rounded-full"></span>
+              Contact Us
+            </h3>
+            
+            <div className="space-y-3">
+              <a 
+                href="mailto:psychologicalinstitute351@gmail.com" 
+                className="flex items-center gap-3 text-gray-300 hover:text-[#D4AF37] transition duration-300 text-sm group justify-center sm:justify-start"
+              >
+                <span className="text-lg group-hover:scale-110 transition">📧</span>
+                <span className="break-all">psychologicalinstitute351@gmail.com</span>
+              </a>
+              
+              <a 
+                href="tel:0768856172" 
+                className="flex items-center gap-3 text-gray-300 hover:text-[#D4AF37] transition duration-300 text-sm group justify-center sm:justify-start"
+              >
+                <span className="text-lg group-hover:scale-110 transition">📞</span>
+                <span>+94 76 885 6172</span>
+              </a>
+              
+              <div className="flex items-center gap-3 text-gray-300 text-sm justify-center sm:justify-start">
+                <span className="text-lg">💬</span>
+                <span>WhatsApp • Registration • Support</span>
+              </div>
+
+              <div className="pt-3">
+                <div className="bg-[#D4AF37]/10 rounded-xl p-3 text-center sm:text-left">
+                  <p className="text-[#D4AF37] text-xs font-semibold mb-1">📅 Office Hours</p>
+                  <p className="text-gray-300 text-xs">Mon - Fri: 9:00 AM - 6:00 PM</p>
+                  <p className="text-gray-300 text-xs">Saturday: 9:00 AM - 1:00 PM</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 PWI Psychological. All rights reserved.</p>
+        {/* Newsletter Section */}
+        <div className="mt-10 mb-8 pt-8 border-t border-white/10">
+          <div className="bg-gradient-to-r from-[#D4AF37]/10 to-transparent rounded-2xl p-5">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-center md:text-left">
+                <h4 className="font-semibold text-white text-sm md:text-base">Subscribe to Our Newsletter</h4>
+                <p className="text-gray-400 text-xs mt-1">Get updates about new batches and programs</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#D4AF37] transition"
+                />
+                <button className="px-5 py-2 bg-[#D4AF37] text-[#0B1F3A] rounded-full font-semibold text-sm hover:bg-[#C49B2C] transition-all duration-300 hover:scale-105">
+                  Subscribe
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
+          <p className="text-gray-400 text-xs md:text-sm text-center">
+            © {new Date().getFullYear()} PWI Psychological. All Rights Reserved.
+          </p>
+          
+          <div className="flex gap-4 text-xs text-gray-400">
+            <Link to="/privacy" className="hover:text-[#D4AF37] transition">Privacy Policy</Link>
+            <span>|</span>
+            <Link to="/terms" className="hover:text-[#D4AF37] transition">Terms of Service</Link>
+            <span>|</span>
+            <Link to="/refund" className="hover:text-[#D4AF37] transition">Refund Policy</Link>
+          </div>
+          
+          <p className="text-[#D4AF37] text-xs md:text-sm text-center">
+            Empowering Minds Through Psychology
+          </p>
         </div>
       </div>
     </footer>

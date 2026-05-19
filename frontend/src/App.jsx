@@ -6,8 +6,11 @@ import HomePage from './pages/Landing/HomePage';
 import AboutPage from './pages/Landing/AboutPage';
 import HowToApplyPage from './pages/Landing/HowToApplyPage';
 import ContactPage from './pages/Landing/ContactPage';
+import Coursepage from './pages/Landing/Coursepage';
+import Registerpage from './pages/Landing/Registerpage';
 
 // Auth Pages (to be created)
+import SignInpage from './components/auth/SignInpage';
 
 
 // Role-based dashboards (to be created)
@@ -24,8 +27,11 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/how-to-apply" element={<HowToApplyPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/courses" element={<Coursepage />} />
+        <Route path="/register" element={<Registerpage />} />
         
         {/* Auth Pages */}
+        <Route path="/login" element={<SignInpage />} />
       
         
         {/* Protected Routes - To be added after signup */}
