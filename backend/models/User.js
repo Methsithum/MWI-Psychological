@@ -3,14 +3,9 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
+    fullName: {
       type: String,
-      required: [true, 'First name is required'],
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: [true, 'Last name is required'],
+      required: [true, 'Full name is required'],
       trim: true,
     },
     email: {
@@ -25,6 +20,13 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: 6,
       select: false,
+    },
+    nic: {
+      type: String,
+      default: '',
+      trim: true,
+      unique: true,
+      sparse: true,
     },
     role: {
       type: String,
@@ -44,6 +46,56 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    whatsapp: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    address: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      default: null,
+    },
+    program: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    qualification: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    paymentMethod: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    transactionId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    paymentSlipUrl: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    paymentSlipName: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    additionalNotes: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -57,17 +109,21 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre('save', async function (next) {
+  // Skip if password hasn't been modified
   if (!this.isModified('password')) {
-    return next();
+    return;
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    throw error;
+  }
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return bcrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);

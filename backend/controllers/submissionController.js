@@ -13,7 +13,7 @@ const submitAssignment = asyncHandler(async (req, res) => {
 });
 
 const getSubmissions = asyncHandler(async (req, res) => {
-  const submissions = await Submission.find({ assignment: req.params.assignmentId }).populate('student', 'firstName lastName email');
+  const submissions = await Submission.find({ assignment: req.params.assignmentId }).populate('student', 'fullName email');
   res.status(200).json({ success: true, count: submissions.length, data: submissions });
 });
 

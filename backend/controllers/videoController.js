@@ -2,7 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const Video = require('../models/Video');
 
 const getVideos = asyncHandler(async (req, res) => {
-  const videos = await Video.find({ course: req.params.courseId }).populate('uploader', 'firstName lastName email');
+  const videos = await Video.find({ course: req.params.courseId }).populate('uploader', 'fullName email');
   res.status(200).json({ success: true, count: videos.length, data: videos });
 });
 
