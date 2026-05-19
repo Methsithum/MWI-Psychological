@@ -1,16 +1,19 @@
-const { body, param } = require('express-validator');
+const { body } = require('express-validator');
 
 const loginValidator = [
-  param('role').isIn(['admin', 'teacher', 'student']).withMessage('Role must be admin, teacher, or student'),
   body('email').isEmail().withMessage('A valid email is required'),
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
 const studentRegisterValidator = [
-  body('firstName').notEmpty().withMessage('First name is required'),
-  body('lastName').notEmpty().withMessage('Last name is required'),
+  body('fullName').notEmpty().withMessage('Full name is required'),
   body('email').isEmail().withMessage('A valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('nic').notEmpty().withMessage('NIC is required'),
+  body('program').notEmpty().withMessage('Program is required'),
+  body('course').optional({ nullable: true }).isString().withMessage('Course must be a string'),
+  body('paymentMethod').notEmpty().withMessage('Payment method is required'),
+  body('transactionId').notEmpty().withMessage('Transaction ID is required'),
+  body('phone').optional({ nullable: true }).isString().withMessage('Phone must be a string'),
 ];
 
 module.exports = { loginValidator, studentRegisterValidator };

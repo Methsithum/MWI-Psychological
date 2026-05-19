@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
+import { authAPI } from '../../utils/api';
 
 const Registerpage = () => {
   const navigate = useNavigate();
@@ -163,12 +164,32 @@ const Registerpage = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       
-      // Simulate form submission to backend
-      setTimeout(() => {
+      try {
+        const payload = new FormData();
+        payload.append('fullName', formData.fullName);
+        payload.append('email', formData.email);
+        payload.append('phone', formData.phone);
+        payload.append('whatsapp', formData.whatsapp);
+        payload.append('address', formData.address);
+        payload.append('nic', formData.nic);
+        payload.append('qualification', formData.qualification);
+        payload.append('program', formData.program);
+        payload.append('paymentMethod', formData.paymentMethod);
+        payload.append('transactionId', formData.transactionId);
+        payload.append('additionalNotes', formData.additionalNotes);
+
+        if (paymentSlip) {
+          payload.append('paymentSlip', paymentSlip);
+        }
+
+        await authAPI.registerStudent(payload);
+
         setIsSubmitting(false);
-        alert('Registration submitted successfully! We will contact you within 24 hours.');
-        navigate('/');
-      }, 2000);
+        navigate('/login');
+      } catch (error) {
+        setIsSubmitting(false);
+        setErrors({ submit: error.message || 'Registration failed. Please try again.' });
+      }
     } else {
       // Scroll to top to show errors
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -239,14 +260,14 @@ const Registerpage = () => {
                 <div
                   key={program.id}
                   onClick={() => handleProgramSelect(program.id)}
-                  className={`cursor-pointer transition-all duration-300 rounded-2xl p-5 md:p-6 border-2 ${
+                    className={`cursor-pointer transition-all duration-300 rounded-2xl p-5 md:p-6 border-2 ${
                     selectedProgram === program.id
-                      ? 'border-[#D4AF37] bg-gradient-to-r from-[#D4AF37]/10 to-[#F5E6A8]/20 shadow-xl scale-105'
+                      ? 'border-[#D4AF37] bg-linear-to-r from-[#D4AF37]/10 to-[#F5E6A8]/20 shadow-xl scale-105'
                       : 'border-[#0B1F3A]/10 bg-white hover:shadow-lg hover:scale-102'
                   }`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${program.color} flex items-center justify-center text-3xl shadow-lg`}>
+                    <div className={`w-14 h-14 rounded-xl bg-linear-to-br ${program.color} flex items-center justify-center text-3xl shadow-lg`}>
                       {program.icon}
                     </div>
                     <div className="flex-1">
@@ -283,7 +304,7 @@ const Registerpage = () => {
 
           {/* Registration Form */}
           <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden border border-[#D4AF37]/20">
-            <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] px-6 md:px-8 py-4 md:py-5">
+            <div className="bg-linear-to-r from-[#0B1F3A] to-[#1A3A5A] px-6 md:px-8 py-4 md:py-5">
               <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
                 <span>📝</span>
                 Student Registration Form
@@ -528,7 +549,7 @@ const Registerpage = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-3 md:py-4 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base md:text-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
+                className={`w-full py-3 md:py-4 bg-linear-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base md:text-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
                   isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >

@@ -2,7 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const Material = require('../models/Material');
 
 const getMaterials = asyncHandler(async (req, res) => {
-  const materials = await Material.find({ course: req.params.courseId }).populate('uploader', 'firstName lastName email');
+  const materials = await Material.find({ course: req.params.courseId }).populate('uploader', 'fullName email');
   res.status(200).json({ success: true, count: materials.length, data: materials });
 });
 
