@@ -7,7 +7,7 @@ const markAttendance = asyncHandler(async (req, res) => {
 });
 
 const getAttendance = asyncHandler(async (req, res) => {
-  const attendance = await Attendance.find({ course: req.params.courseId }).populate('student teacher', 'firstName lastName email');
+  const attendance = await Attendance.find({ course: req.params.courseId }).populate('student teacher', 'fullName email');
   res.status(200).json({ success: true, count: attendance.length, data: attendance });
 });
 

@@ -7,7 +7,7 @@ const createAssignment = asyncHandler(async (req, res) => {
 });
 
 const getAssignments = asyncHandler(async (req, res) => {
-  const assignments = await Assignment.find({ course: req.params.courseId }).populate('teacher', 'firstName lastName email');
+  const assignments = await Assignment.find({ course: req.params.courseId }).populate('teacher', 'fullName email');
   res.status(200).json({ success: true, count: assignments.length, data: assignments });
 });
 

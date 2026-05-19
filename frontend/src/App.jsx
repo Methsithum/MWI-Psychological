@@ -9,14 +9,12 @@ import ContactPage from './pages/Landing/ContactPage';
 import Coursepage from './pages/Landing/Coursepage';
 import Registerpage from './pages/Landing/Registerpage';
 
-// Auth Pages (to be created)
 import SignInpage from './components/auth/SignInpage';
-
-
-// Role-based dashboards (to be created)
-// import StudentDashboard from './pages/student/StudentDashboard';
-// import LecturerDashboard from './pages/lecturer/LecturerDashboard';
-// import AdminDashboard from './pages/admin/AdminDashboard';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import StudentDashboard from './pages/dashboard/StudentDashboard';
+import TeacherDashboard from './pages/dashboard/TeacherDashboard';
+import AdminDashboard from './pages/dashboard/AdminDashboard';
+import CreateCourse from './pages/teacher/CreateCourse';
 
 function App() {
   return (
@@ -32,12 +30,40 @@ function App() {
         
         {/* Auth Pages */}
         <Route path="/login" element={<SignInpage />} />
+
+        <Route
+          path="/student/dashboard"
+          element={
+            <ProtectedRoute requiredRole="student">
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <ProtectedRoute requiredRole="teacher">
+              <TeacherDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/courses/create"
+          element={
+            <ProtectedRoute requiredRole="teacher">
+              <CreateCourse />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       
-        
-        {/* Protected Routes - To be added after signup */}
-        {/* <Route path="/student/*" element={<StudentDashboard />} /> */}
-        {/* <Route path="/lecturer/*" element={<LecturerDashboard />} /> */}
-        {/* <Route path="/admin/*" element={<AdminDashboard />} /> */}
       </Routes>
     </Router>
   );

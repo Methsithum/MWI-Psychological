@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
+import { authAPI, setAuthSession } from '../../utils/api';
 
 const SignInpage = () => {
   const navigate = useNavigate();
@@ -50,18 +51,35 @@ const SignInpage = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       
-      setTimeout(() => {
+      try {
+        const response = await authAPI.login(formData.email, formData.password);
+        const userName = response?.user?.fullName || response?.user?.name || formData.email;
+        const userId = response?.user?.id || response?.user?._id || '';
+        const course = response?.user?.course?._id || response?.user?.course || '';
+
+        setAuthSession(
+          {
+            token: response.token,
+            role: response.user.role,
+            name: userName,
+            id: userId,
+            course,
+          },
+          formData.rememberMe,
+        );
+        const role = response?.user?.role || 'student';
+        const redirectMap = {
+          student: '/student/dashboard',
+          teacher: '/teacher/dashboard',
+          admin: '/admin/dashboard',
+        };
+
+        navigate(redirectMap[role] || '/');
+      } catch (error) {
+        setErrors({ submit: error.message || 'Login failed. Please try again.' });
+      } finally {
         setIsSubmitting(false);
-        if (formData.rememberMe) {
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userEmail', formData.email);
-        } else {
-          sessionStorage.setItem('isLoggedIn', 'true');
-          sessionStorage.setItem('userEmail', formData.email);
-        }
-        alert('Login successful! Redirecting to dashboard...');
-        navigate('/');
-      }, 1500);
+      }
     }
   };
 
@@ -105,6 +123,12 @@ const SignInpage = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
+                  {errors.submit && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {errors.submit}
+                    </div>
+                  )}
+
                   {/* Email Field */}
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-2">
@@ -194,7 +218,7 @@ const SignInpage = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full py-3 md:py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
+                    className={`w-full py-3 md:py-3.5 bg-linear-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
                       isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >
@@ -226,7 +250,7 @@ const SignInpage = () => {
 
             {/* Right Side - Big Banner */}
             <div className="order-1 lg:order-2">
-              <div className="relative bg-gradient-to-br from-[#0B1F3A] to-[#1A3A5A] rounded-2xl md:rounded-3xl p-8 md:p-12 text-white shadow-2xl overflow-hidden">
+              <div className="relative bg-linear-to-br from-[#0B1F3A] to-[#1A3A5A] rounded-2xl md:rounded-3xl p-8 md:p-12 text-white shadow-2xl overflow-hidden">
                 {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
