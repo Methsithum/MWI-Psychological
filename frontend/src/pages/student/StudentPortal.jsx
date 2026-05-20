@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../utils/api';
+import auth from '../../utils/auth';
+import StudentTopbar from '../../components/student/StudentTopbar';
 
 const StudentPortal = () => {
   const navigate = useNavigate();
@@ -10,147 +13,142 @@ const StudentPortal = () => {
   const [submissionFile, setSubmissionFile] = useState(null);
   const [submissionText, setSubmissionText] = useState('');
 
-  // Mock Student Data
-  const [student] = useState({
-    id: 1,
-    fullName: 'Amali Perera',
-    email: 'amali@example.com',
-    program: 'hrm',
-    nic: '987654321V'
+  const [student, setStudent] = useState(() => {
+    const user = auth.getUser();
+    return {
+      id: user?.id || user?._id || 'student',
+      fullName: user?.fullName || 'Student',
+      email: user?.email || '',
+      course: user?.course || null,
+      programme: user?.course?.title || user?.programme || '',
+      nic: user?.nic || '',
+    };
   });
 
-  // Mock Courses Data
-  const [courses] = useState([
-    {
-      id: 1,
-      name: 'Diploma in HRM & Behavioral Psychology',
-      duration: '6 Months',
-      fee: 'Rs. 45,000',
-      status: 'active',
-      description: 'Professional diploma in HRM and Behavioral Psychology covering workplace psychology, employee behaviour, leadership, and organizational development.'
-    },
-    {
-      id: 2,
-      name: 'Diploma in Buddhist Counselling & Applied Buddhist Psychology',
-      duration: '6 Months',
-      fee: 'Rs. 45,000',
-      status: 'active',
-      description: 'Diploma combining Buddhist philosophy, counselling techniques, mindfulness practices, and applied psychological knowledge.'
-    }
-  ]);
+  const [courses, setCourses] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [assignments, setAssignments] = useState([]);
 
-  // Mock Announcements
-  const [announcements] = useState([
-    {
-      id: 1,
-      courseId: 1,
-      title: 'Welcome to the Program!',
-      description: 'Welcome all students to the Diploma in HRM & Behavioral Psychology. The first live lecture will be on January 15th at 7:00 PM.',
-      link: 'https://zoom.us/j/123456789',
-      date: '2024-01-10 10:00 AM'
-    },
-    {
-      id: 2,
-      courseId: 2,
-      title: 'First Session Announcement',
-      description: 'The introductory session for Buddhist Counselling will start on January 16th. Please join the Zoom link below.',
-      link: 'https://zoom.us/j/987654321',
-      date: '2024-01-10 11:00 AM'
-    }
-  ]);
-
-  // Mock Videos
-  const [videos] = useState([
-    {
-      id: 1,
-      courseId: 1,
-      title: 'Introduction to HRM',
-      description: 'This lecture covers the basics of Human Resource Management and organizational behavior.',
-      link: 'https://zoom.us/j/123456789',
-      date: '2024-01-15'
-    },
-    {
-      id: 2,
-      courseId: 1,
-      title: 'Employee Motivation Techniques',
-      description: 'Learn about different motivation theories and how to apply them in workplace.',
-      link: 'https://zoom.us/j/123456789',
-      date: '2024-01-20'
-    },
-    {
-      id: 3,
-      courseId: 2,
-      title: 'Introduction to Buddhist Psychology',
-      description: 'Understanding the mind according to Buddhist teachings.',
-      link: 'https://zoom.us/j/987654321',
-      date: '2024-01-16'
-    }
-  ]);
-
-  // Mock Documents
-  const [documents] = useState([
-    {
-      id: 1,
-      courseId: 1,
-      title: 'HRM Fundamentals - Chapter 1',
-      fileName: 'HRM_Chapter1.pdf',
-      date: '2024-01-10'
-    },
-    {
-      id: 2,
-      courseId: 1,
-      title: 'Employee Behaviour - Study Guide',
-      fileName: 'Employee_Behaviour_Guide.pdf',
-      date: '2024-01-12'
-    },
-    {
-      id: 3,
-      courseId: 2,
-      title: 'Mindfulness Practices - PDF Notes',
-      fileName: 'Mindfulness_Practices.pdf',
-      date: '2024-01-11'
-    }
-  ]);
-
-  // Mock Assignments
-  const [assignments] = useState([
-    {
-      id: 1,
-      courseId: 1,
-      title: 'HRM Fundamentals Assignment',
-      description: 'Write an essay about the importance of HRM in modern organizations.',
-      dueDate: '2024-01-30',
-      totalMarks: 100
-    },
-    {
-      id: 2,
-      courseId: 1,
-      title: 'Employee Motivation Case Study',
-      description: 'Analyze the given case study and provide motivation strategies.',
-      dueDate: '2024-02-15',
-      totalMarks: 100
-    },
-    {
-      id: 3,
-      courseId: 2,
-      title: 'Mindfulness Reflection Paper',
-      description: 'Write a reflection on your mindfulness practice experience.',
-      dueDate: '2024-02-10',
-      totalMarks: 100
-    }
-  ]);
-
-  // Mock Submissions
   const [submissions, setSubmissions] = useState([]);
+  const [attendance, setAttendance] = useState([]);
 
-  // Mock Attendance
-  const [attendance] = useState([
-    { id: 1, studentId: 1, date: '2024-01-15 07:00 PM', status: 'present' },
-    { id: 2, studentId: 1, date: '2024-01-16 07:00 PM', status: 'present' },
-    { id: 3, studentId: 1, date: '2024-01-17 07:00 PM', status: 'present' },
-    { id: 4, studentId: 1, date: '2024-01-18 07:00 PM', status: 'present' },
-    { id: 5, studentId: 1, date: '2024-01-19 07:00 PM', status: 'present' }
-  ]);
+  const loadCourseContent = async (course) => {
+    if (!course?.courseId) return;
+    try {
+      const [videosRes, materialsRes, assignmentsRes, attendanceRes, notificationsRes] = await Promise.all([
+        api.getCourseVideos(course.courseId),
+        api.getCourseMaterials(course.courseId),
+        api.getCourseAssignments(course.courseId),
+        api.getCourseAttendance(course.courseId),
+        api.getNotifications().catch(() => null),
+      ]);
+
+      setVideos((videosRes?.data || []).map((video, idx) => ({
+        id: video._id || idx,
+        courseId: course.id,
+        title: video.title,
+        description: video.description || '',
+        link: video.videoUrl || video.link || '#',
+        date: video.createdAt ? new Date(video.createdAt).toLocaleDateString() : '',
+      })));
+
+      setDocuments((materialsRes?.data || []).map((material, idx) => ({
+        id: material._id || idx,
+        courseId: course.id,
+        title: material.title,
+        fileName: material.fileUrl ? String(material.fileUrl).split('/').pop() : 'File',
+        date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
+      })));
+
+      setAssignments((assignmentsRes?.data || []).map((assignment, idx) => ({
+        id: assignment._id || idx,
+        courseId: course.id,
+        title: assignment.title,
+        description: assignment.description,
+        dueDate: assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '',
+        totalMarks: assignment.totalMarks || 0,
+      })));
+
+      setAttendance((attendanceRes?.data || []).map((record, idx) => ({
+        id: record._id || idx,
+        studentId: record.student?._id || record.student || idx,
+        date: record.date ? new Date(record.date).toLocaleString() : new Date(record.createdAt).toLocaleString(),
+        status: record.status || 'present',
+      })));
+
+      setAnnouncements((notificationsRes?.data || []).map((notification, idx) => ({
+        id: notification._id || idx,
+        courseId: course.id,
+        title: notification.title || notification.subject || 'Notification',
+        description: notification.message || notification.description || '',
+        link: notification.link || '',
+        date: notification.createdAt ? new Date(notification.createdAt).toLocaleString() : new Date().toLocaleString(),
+      })));
+    } catch (error) {
+      console.error('Failed to load course content', error);
+      setVideos([]);
+      setDocuments([]);
+      setAssignments([]);
+      setAttendance([]);
+      setAnnouncements([]);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const coursesRes = await api.getCourses();
+        const backendCourses = Array.isArray(coursesRes?.data) ? coursesRes.data : [];
+        const normalizedCourses = backendCourses.map((course, index) => ({
+          id: index + 1,
+          courseId: course._id,
+          name: course.title || course.name || 'Course',
+          duration: course.duration || '6 Months',
+          fee: typeof course.fee === 'number' ? `Rs. ${course.fee.toLocaleString()}` : (course.fee || 'Rs. 0'),
+          status: course.status === 'published' ? 'active' : 'inactive',
+          description: course.description || '',
+        }));
+
+        setCourses(normalizedCourses);
+        const userCourse = auth.getUser()?.course;
+        const preferredBackendCourse = backendCourses.find((course) => {
+          const courseId = String(course._id);
+          return courseId === String(userCourse?.id || userCourse?._id || userCourse) ||
+            course.title === userCourse?.title ||
+            course.code === userCourse?.code;
+        }) || backendCourses[0];
+
+        if (preferredBackendCourse) {
+          const preferredCourse = normalizedCourses.find((course) => course.courseId === String(preferredBackendCourse._id)) || normalizedCourses[0];
+          setSelectedCourse(preferredCourse);
+          setStudent((prev) => ({
+            ...prev,
+            course: {
+              id: preferredBackendCourse._id,
+              title: preferredBackendCourse.title,
+              code: preferredBackendCourse.code,
+            },
+            programme: preferredBackendCourse.title || preferredCourse?.name || '',
+          }));
+          await loadCourseContent(preferredCourse);
+        }
+      } catch (error) {
+        console.error('Failed to load student dashboard data', error);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      setStudent((prev) => ({
+        ...prev,
+        programme: selectedCourse.name,
+      }));
+      loadCourseContent(selectedCourse);
+    }
+  }, [selectedCourse]);
 
   // Handle assignment submission
   const handleSubmitAssignment = () => {
@@ -213,12 +211,15 @@ const StudentPortal = () => {
 
   // Get available courses for student
   const getStudentCourses = () => {
-    const studentProgram = student.program;
-    return courses.filter(course => {
-      if (studentProgram === 'hrm' && course.name.includes('HRM')) return true;
-      if (studentProgram === 'buddhist' && course.name.includes('Buddhist')) return true;
-      return false;
-    });
+    if (student.course?.id) {
+      return courses.filter((course) => String(course.courseId) === String(student.course.id));
+    }
+
+    if (student.course?.title) {
+      return courses.filter((course) => course.name === student.course.title);
+    }
+
+    return courses;
   };
 
   const studentCourses = getStudentCourses();
@@ -232,43 +233,11 @@ const StudentPortal = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F8F5EF] to-white">
-      {/* Header */}
-      <header className="bg-[#0B1F3A] text-white sticky top-0 z-50 shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#D4AF37] rounded-xl flex items-center justify-center">
-                <span className="text-[#0B1F3A] font-bold text-lg">PWI</span>
-              </div>
-              <div>
-                <h1 className="font-bold text-lg">Student Portal</h1>
-                <p className="text-xs text-white/60">PWI Psychological Institute</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 bg-white/10 px-3 py-1.5 rounded-full">
-                <div className="w-8 h-8 bg-[#D4AF37]/30 rounded-full flex items-center justify-center">
-                  <span className="text-sm">👨‍🎓</span>
-                </div>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium">{student.fullName}</p>
-                  <p className="text-xs text-white/60">{student.program === 'hrm' ? 'HRM Program' : 'Buddhist Counselling'}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => navigate('/signin')}
-                className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-sm transition"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-linear-to-br from-[#F8F5EF] to-white">
+      <StudentTopbar student={student} title="Student Portal" subtitle="PWI Psychological Institute" />
 
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] text-white">
+      <div className="bg-linear-to-r from-[#0B1F3A] to-[#1A3A5A] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
@@ -277,7 +246,7 @@ const StudentPortal = () => {
             </div>
             <div className="flex gap-4">
               <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
-                <p className="text-2xl font-bold text-[#D4AF37]">{attendancePercentage}%</p>
+                  <p className="text-2xl font-bold text-[#D4AF37]">{attendancePercentage}%</p>
                 <p className="text-xs text-white/60">Attendance</p>
               </div>
               <div className="text-center px-4 py-2 bg-white/10 rounded-xl">
@@ -301,7 +270,7 @@ const StudentPortal = () => {
                 onClick={() => setSelectedCourse(course)}
                 className={`cursor-pointer rounded-xl p-4 transition-all duration-300 ${
                   selectedCourse?.id === course.id
-                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] shadow-lg scale-102'
+                    ? 'bg-linear-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] shadow-lg scale-102'
                     : 'bg-white border border-[#D4AF37]/20 hover:shadow-lg'
                 }`}
               >
@@ -389,7 +358,7 @@ const StudentPortal = () => {
                 ) : (
                   getCourseContent(videos).map(video => (
                     <div key={video.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-[#D4AF37]/20">
-                      <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] p-4">
+                      <div className="bg-linear-to-r from-[#0B1F3A] to-[#1A3A5A] p-4">
                         <h3 className="font-bold text-white">{video.title}</h3>
                         <p className="text-white/60 text-xs mt-1">{video.date}</p>
                       </div>
@@ -491,7 +460,7 @@ const StudentPortal = () => {
             {/* Attendance Tab */}
             {activeTab === 'attendance' && (
               <div>
-                <div className="bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] rounded-2xl p-6 text-white mb-6">
+                <div className="bg-linear-to-r from-[#D4AF37] to-[#C49B2C] rounded-2xl p-6 text-white mb-6">
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                       <p className="text-sm opacity-90">Your Attendance Summary</p>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../../utils/api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -19,41 +20,70 @@ const AdminDashboard = () => {
     description: ''
   });
 
+  const normalizeCourse = (course, index = 0) => ({
+    id: course._id || course.id || String(index + 1),
+    courseId: course._id || course.id || String(index + 1),
+    name: course.title || course.name || 'Course',
+    duration: course.duration || '6 Months',
+    fee: typeof course.fee === 'number' ? `Rs. ${course.fee.toLocaleString()}` : (course.fee || 'Rs. 0'),
+    students: Array.isArray(course.students) ? course.students.length : (course.students || 0),
+    status: course.status === 'published' ? 'active' : 'inactive',
+    description: course.description || '',
+  });
+
+  const normalizePendingRegistration = (registration) => ({
+    id: registration._id,
+    fullName: registration.fullName,
+    email: registration.email,
+    phone: registration.phone,
+    programme: registration.programme || registration.course?.title || registration.course?.code || 'Unknown',
+    courseId: registration.course?._id || registration.course,
+    transactionId: registration.paymentInformation?.transactionId || '',
+    paymentSlip: registration.paymentInformation?.paymentSlipUrl || '',
+    nic: registration.nic,
+    whatsappNumber: registration.whatsappNumber,
+    address: registration.address,
+    highestQualification: registration.highestQualification,
+    status: registration.status,
+  });
+
+  const normalizeApprovedUser = (user, courseLookup) => ({
+    id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    programme: courseLookup.get(String(user.course)) || 'Student',
+    status: user.status,
+  });
+
+  const loadDashboardData = async () => {
+    try {
+      const [requestsRes, usersRes, coursesRes] = await Promise.all([
+        api.getPendingStudents(),
+        api.getAllUsers(),
+        api.getCourses(),
+      ]);
+
+      const backendCourses = Array.isArray(coursesRes?.data) ? coursesRes.data : [];
+      const courseLookup = new Map(
+        backendCourses.map((course) => [String(course._id), course.title || course.name || 'Course'])
+      );
+
+      setCourses(backendCourses.map((course, index) => normalizeCourse(course, index)));
+      setRegistrationRequests((requestsRes?.data || []).map(normalizePendingRegistration));
+
+      const approved = (usersRes?.data || [])
+        .filter((user) => user.role === 'student' && user.status === 'approved')
+        .map((user) => normalizeApprovedUser(user, courseLookup));
+      setApprovedStudents(approved);
+    } catch (error) {
+      console.error('Failed to load admin dashboard data', error);
+    }
+  };
+
   // Load data from localStorage on component mount
   useEffect(() => {
-    const requests = JSON.parse(localStorage.getItem('registrationRequests') || '[]');
-    setRegistrationRequests(requests);
-
-    const approved = JSON.parse(localStorage.getItem('approvedUsers') || '[]');
-    setApprovedStudents(approved);
-
-    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-    if (savedCourses.length === 0) {
-      const defaultCourses = [
-        {
-          id: 1,
-          name: 'Diploma in HRM & Behavioral Psychology',
-          duration: '6 Months',
-          fee: 'Rs. 45,000',
-          students: 45,
-          status: 'active',
-          description: 'Professional diploma in HRM and Behavioral Psychology'
-        },
-        {
-          id: 2,
-          name: 'Diploma in Buddhist Counselling & Applied Buddhist Psychology',
-          duration: '6 Months',
-          fee: 'Rs. 45,000',
-          students: 38,
-          status: 'active',
-          description: 'Diploma in Buddhist Counselling and Psychology'
-        }
-      ];
-      setCourses(defaultCourses);
-      localStorage.setItem('courses', JSON.stringify(defaultCourses));
-    } else {
-      setCourses(savedCourses);
-    }
+    loadDashboardData();
 
     const activities = JSON.parse(localStorage.getItem('systemActivities') || '[]');
     if (activities.length === 0) {
@@ -80,35 +110,59 @@ const AdminDashboard = () => {
     localStorage.setItem('systemActivities', JSON.stringify(updatedActivities));
   };
 
-  const handleApprove = (studentId) => {
-    const student = registrationRequests.find(s => s.id === studentId);
-    if (student) {
-      const approvedUser = {
-        ...student,
+  const handleApprove = async (studentId) => {
+    try {
+      const res = await api.approveStudent(studentId);
+      console.log('approveStudent response:', res);
+      if (!res || !res.success) {
+        const msg = res?.message || 'Approval failed';
+        alert(msg);
+        return;
+      }
+
+      const approvedRegistration = res?.data?.registration;
+      const approvedStudent = approvedRegistration ? {
+        id: approvedRegistration.user || studentId,
+        fullName: approvedRegistration.fullName,
+        email: approvedRegistration.email,
+        phone: approvedRegistration.phone,
+        programme: approvedRegistration.programme || approvedRegistration.course?.title || 'Student',
         status: 'approved',
-        approvedDate: new Date().toLocaleString()
-      };
-      const updatedApproved = [...approvedStudents, approvedUser];
-      setApprovedStudents(updatedApproved);
-      localStorage.setItem('approvedUsers', JSON.stringify(updatedApproved));
+      } : null;
 
-      const updatedRequests = registrationRequests.filter(s => s.id !== studentId);
-      setRegistrationRequests(updatedRequests);
-      localStorage.setItem('registrationRequests', JSON.stringify(updatedRequests));
+      if (approvedStudent) {
+        setRegistrationRequests((prev) => prev.filter((item) => item.id !== studentId));
+        setApprovedStudents((prev) => [approvedStudent, ...prev.filter((item) => item.id !== approvedStudent.id)]);
+      }
 
-      addActivity(`Approved student: ${student.fullName}`, 'approval');
-      alert(`Student ${student.fullName} has been approved successfully!`);
+      addActivity('Approved student registration', 'approval');
+      await loadDashboardData();
+      alert(res.message || 'Student has been approved successfully!');
+    } catch (error) {
+      console.error('Approve error:', error);
+      alert(error?.message || 'Failed to approve student (network/server error)');
     }
   };
 
-  const handleReject = (studentId) => {
-    const student = registrationRequests.find(s => s.id === studentId);
-    const updatedRequests = registrationRequests.filter(s => s.id !== studentId);
-    setRegistrationRequests(updatedRequests);
-    localStorage.setItem('registrationRequests', JSON.stringify(updatedRequests));
-    
-    addActivity(`Rejected student: ${student?.fullName}`, 'rejection');
-    alert(`Student ${student?.fullName} has been rejected.`);
+  const handleReject = async (studentId) => {
+    try {
+      const res = await api.rejectStudent(studentId);
+      console.log('rejectStudent response:', res);
+      if (!res || !res.success) {
+        const msg = res?.message || 'Rejection failed';
+        alert(msg);
+        return;
+      }
+
+      setRegistrationRequests((prev) => prev.filter((item) => item.id !== studentId));
+
+      addActivity('Rejected student registration', 'rejection');
+      await loadDashboardData();
+      alert(res.message || 'Student has been rejected.');
+    } catch (error) {
+      console.error('Reject error:', error);
+      alert(error?.message || 'Failed to reject student (network/server error)');
+    }
   };
 
   const handleViewSlip = (student) => {
@@ -116,48 +170,68 @@ const AdminDashboard = () => {
     setShowSlipModal(true);
   };
 
-  const handleAddCourse = () => {
+  const handleAddCourse = async () => {
     if (newCourse.name && newCourse.duration && newCourse.fee) {
-      const course = {
-        id: Date.now(),
-        ...newCourse,
-        students: 0,
-        status: 'active'
-      };
-      const updatedCourses = [...courses, course];
-      setCourses(updatedCourses);
-      localStorage.setItem('courses', JSON.stringify(updatedCourses));
-      addActivity(`Added new course: ${newCourse.name}`, 'course');
-      setShowAddCourseModal(false);
-      setNewCourse({ name: '', duration: '', fee: '', description: '' });
-      alert('Course added successfully!');
+      try {
+        const title = newCourse.name;
+        const code = title
+          .toUpperCase()
+          .replace(/[^A-Z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .slice(0, 24) || `COURSE-${Date.now()}`;
+        const fee = Number(String(newCourse.fee).replace(/[^\d]/g, '')) || 0;
+
+        const response = await api.createCourse({
+          title,
+          code,
+          description: newCourse.description,
+          fee,
+          status: 'published',
+        });
+
+        console.log('Course created:', response);
+        addActivity(`Added new course: ${newCourse.name}`, 'course');
+        setShowAddCourseModal(false);
+        setNewCourse({ name: '', duration: '', fee: '', description: '' });
+        await loadDashboardData();
+        alert('Course added successfully!');
+      } catch (error) {
+        console.error('Course creation error:', error);
+        console.error('Full error details:', JSON.stringify(error, null, 2));
+        const message = error?.message || (typeof error === 'string' ? error : 'Failed to add course');
+        alert(`Error: ${message}`);
+      }
     } else {
       alert('Please fill all required fields');
     }
   };
 
-  const handleDeleteCourse = (courseId) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
-      const course = courses.find(c => c.id === courseId);
-      const updatedCourses = courses.filter(c => c.id !== courseId);
-      setCourses(updatedCourses);
-      localStorage.setItem('courses', JSON.stringify(updatedCourses));
-      addActivity(`Deleted course: ${course?.name}`, 'course');
+  const handleDeleteCourse = async (courseId) => {
+    if (!window.confirm('Are you sure you want to delete this course?')) return;
+    try {
+      await api.deleteCourse(courseId);
+      addActivity('Deleted course', 'course');
+      await loadDashboardData();
       alert('Course deleted successfully!');
+    } catch (error) {
+      console.error('Course deletion error:', error);
+      alert(error?.message || 'Failed to delete course');
     }
   };
 
-  const handleToggleCourseStatus = (courseId) => {
-    const updatedCourses = courses.map(course => {
-      if (course.id === courseId) {
-        const newStatus = course.status === 'active' ? 'inactive' : 'active';
-        addActivity(`${newStatus === 'active' ? 'Activated' : 'Deactivated'} course: ${course.name}`, 'course');
-        return { ...course, status: newStatus };
-      }
-      return course;
-    });
-    setCourses(updatedCourses);
-    localStorage.setItem('courses', JSON.stringify(updatedCourses));
+  const handleToggleCourseStatus = async (courseId) => {
+    const course = courses.find((item) => item.id === courseId);
+    if (!course) return;
+
+    const nextStatus = course.status === 'active' ? 'draft' : 'published';
+    try {
+      await api.updateCourse(courseId, { status: nextStatus });
+      addActivity(`${nextStatus === 'published' ? 'Activated' : 'Deactivated'} course: ${course.name}`, 'course');
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Course status update error:', error);
+      alert(error?.message || 'Failed to update course status');
+    }
   };
 
   const stats = [
@@ -365,7 +439,7 @@ const AdminDashboard = () => {
                             <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.fullName}</td>
                             <td className="p-2 sm:p-3 text-xs sm:text-sm truncate max-w-[120px]">{student.email}</td>
                             <td className="p-2 sm:p-3 text-xs sm:text-sm hidden sm:table-cell">{student.phone}</td>
-                            <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.program === 'hrm' ? 'HRM' : 'Buddhist'}</td>
+                            <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.programme || student.program || 'Unknown'}</td>
                             <td className="p-2 sm:p-3 text-xs sm:text-sm">
                               <div className="flex gap-1 sm:gap-2">
                                 <button
@@ -421,7 +495,7 @@ const AdminDashboard = () => {
                             <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.fullName}</td>
                             <td className="p-2 sm:p-3 text-xs sm:text-sm truncate max-w-[120px]">{student.email}</td>
                             <td className="p-2 sm:p-3 text-xs sm:text-sm hidden sm:table-cell">{student.phone}</td>
-                            <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.program === 'hrm' ? 'HRM' : 'Buddhist'}</td>
+                            <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.programme || student.program || 'Unknown'}</td>
                           </tr>
                         ))}
                       </tbody>

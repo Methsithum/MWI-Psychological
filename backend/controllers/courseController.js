@@ -12,7 +12,7 @@ const getCourses = asyncHandler(async (req, res) => {
 
 const getAvailableCourses = asyncHandler(async (req, res) => {
   const courses = await Course.find({ status: 'published' })
-    .select('title code description teacher status createdAt')
+    .select('title code description fee teacher status createdAt')
     .populate('teacher', 'fullName email')
     .sort({ createdAt: 1 });
 
@@ -58,7 +58,7 @@ const getCourseStudents = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
   const status = req.query.status || 'all';
 
-  const course = await Course.findById(courseId).select('title code status');
+  const course = await Course.findById(courseId).select('title code status fee');
   if (!course) {
     throw new ApiError(404, 'Course not found');
   }

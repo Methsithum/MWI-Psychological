@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
+import api from '../../utils/api';
 
 const SignInpage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('student');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -48,31 +50,34 @@ const SignInpage = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       
-      setTimeout(() => {
-        setIsSubmitting(false);
-        
-        // Check if user is approved
-        const approvedUsers = JSON.parse(localStorage.getItem('approvedUsers') || '[]');
-        const user = approvedUsers.find(
-          u => u.email === formData.email && u.nic === formData.password
-        );
-        
-        if (user) {
-          if (formData.rememberMe) {
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', formData.email);
-            localStorage.setItem('userName', user.fullName);
-          } else {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userEmail', formData.email);
-            sessionStorage.setItem('userName', user.fullName);
+      try {
+        const res = await api.login(selectedRole, formData.email, formData.password);
+        if (res && res.token) {
+          const storage = formData.rememberMe ? localStorage : sessionStorage;
+          storage.setItem('token', res.token);
+          storage.setItem('user', JSON.stringify(res.user));
+          alert(`Welcome back ${res.user.fullName || res.user.email}!`);
+          
+          // Route to correct dashboard based on role
+          let dashboardPath = '/';
+          if (res.user.role === 'admin') {
+            dashboardPath = '/admin';
+          } else if (res.user.role === 'teacher') {
+            dashboardPath = '/teacher';
+          } else if (res.user.role === 'student') {
+            dashboardPath = '/student';
           }
-          alert(`Welcome back ${user.fullName}! Login successful.`);
-          navigate('/');
+          
+          navigate(dashboardPath);
         } else {
-          alert('Invalid email or password. If you have registered, please wait for admin approval.');
+          alert(res.message || 'Invalid email or password. If you registered, wait for approval.');
         }
-      }, 1500);
+      } catch (err) {
+        console.error('Login error:', err);
+        alert(err?.message || 'Invalid email or password. Try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -121,6 +126,29 @@ const SignInpage = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-5 md:p-6 space-y-4">
+                  {/* Role Selector */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#0B1F3A] mb-2">
+                      Login As
+                    </label>
+                    <div className="flex gap-2">
+                      {['student', 'teacher', 'admin'].map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => setSelectedRole(role)}
+                          className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm transition ${
+                            selectedRole === role
+                              ? 'bg-[#D4AF37] text-[#0B1F3A]'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          {role.charAt(0).toUpperCase() + role.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1.5">
                       Email Address
@@ -207,7 +235,7 @@ const SignInpage = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full py-2.5 md:py-3 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
+                    className={`w-full py-2.5 md:py-3 bg-linear-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
                       isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >
@@ -238,7 +266,7 @@ const SignInpage = () => {
 
             {/* Right Side - Big Banner */}
             <div className="order-1 lg:order-2">
-              <div className="relative bg-gradient-to-br from-[#0B1F3A] to-[#1A3A5A] rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-2xl overflow-hidden">
+              <div className="relative bg-linear-to-br from-[#0B1F3A] to-[#1A3A5A] rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-2xl overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
                 

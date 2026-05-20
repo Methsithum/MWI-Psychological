@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../utils/api';
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
@@ -27,32 +28,118 @@ const TeacherDashboard = () => {
     videoFile: null
   });
 
+  const normalizeCourse = (course, index = 0) => ({
+    id: index + 1,
+    courseId: course._id || course.id,
+    name: course.title || course.name || 'Course',
+    duration: course.duration || '6 Months',
+    fee: typeof course.fee === 'number' ? `Rs. ${course.fee.toLocaleString()}` : (course.fee || 'Rs. 0'),
+    status: course.status === 'published' ? 'active' : 'inactive',
+    description: course.description || '',
+  });
+
+  const refreshCourseData = async (course) => {
+    if (!course) return;
+    try {
+      const [studentsRes, assignmentsRes, videosRes, materialsRes, attendanceRes] = await Promise.all([
+        api.getCourseStudents(course.courseId),
+        api.getCourseAssignments(course.courseId),
+        api.getCourseVideos(course.courseId),
+        api.getCourseMaterials(course.courseId),
+        api.getCourseAttendance(course.courseId),
+      ]);
+
+      setStudents((studentsRes?.data || []).map((registration, idx) => ({
+        id: registration.user?._id || registration._id || idx,
+        fullName: registration.user?.fullName || registration.fullName || 'Student',
+        email: registration.user?.email || registration.email || '',
+        phone: registration.user?.phone || registration.phone || '',
+        status: registration.status || 'approved',
+      })));
+
+      setAssignments((assignmentsRes?.data || []).map((assignment, idx) => ({
+        id: assignment._id || idx,
+        courseId: course.id,
+        title: assignment.title,
+        description: assignment.description,
+        dueDate: assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '',
+        totalMarks: assignment.totalMarks || 0,
+      })));
+
+      setVideos((videosRes?.data || []).map((video, idx) => ({
+        id: video._id || idx,
+        courseId: course.id,
+        title: video.title,
+        description: video.description || '',
+        link: video.videoUrl || video.link || '#',
+        date: video.createdAt ? new Date(video.createdAt).toLocaleDateString() : '',
+      })));
+
+      setDocuments((materialsRes?.data || []).map((material, idx) => ({
+        id: material._id || idx,
+        courseId: course.id,
+        title: material.title,
+        fileName: material.fileUrl ? String(material.fileUrl).split('/').pop() : 'File',
+        date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
+      })));
+
+      setAttendance((attendanceRes?.data || []).map((record, idx) => ({
+        id: record._id || idx,
+        studentId: record.student?._id || record.student || idx,
+        date: record.date ? new Date(record.date).toLocaleString() : new Date(record.createdAt).toLocaleString(),
+        status: record.status || 'present',
+      })));
+    } catch (error) {
+      console.error('Failed to load course data', error);
+      setStudents([]);
+      setAssignments([]);
+      setVideos([]);
+      setDocuments([]);
+      setAttendance([]);
+    }
+  };
+
   // Load data from localStorage
   useEffect(() => {
-    const savedCourses = JSON.parse(localStorage.getItem('courses') || '[]');
-    setCourses(savedCourses);
+    (async () => {
+      try {
+        const coursesRes = await api.getCourses();
+        const backendCourses = Array.isArray(coursesRes?.data) ? coursesRes.data : [];
+        const normalizedCourses = backendCourses.map((course, index) => normalizeCourse(course, index));
+        setCourses(normalizedCourses);
+        setSelectedCourse(normalizedCourses[0] || null);
 
-    const savedAnnouncements = JSON.parse(localStorage.getItem('announcements') || '[]');
-    setAnnouncements(savedAnnouncements);
+        const notificationsRes = await api.getNotifications().catch(() => null);
+        setAnnouncements((notificationsRes?.data || []).map((notification, idx) => ({
+          id: notification._id || idx,
+          courseId: normalizedCourses[0]?.id || 1,
+          title: notification.title || notification.subject || 'Notification',
+          description: notification.message || notification.description || '',
+          link: notification.link || '',
+          date: notification.createdAt ? new Date(notification.createdAt).toLocaleString() : new Date().toLocaleString(),
+        })));
 
-    const savedVideos = JSON.parse(localStorage.getItem('videos') || '[]');
-    setVideos(savedVideos);
+        setSubmissions([]);
+        setStudents([]);
+        setDocuments([]);
+        setVideos([]);
+        setAssignments([]);
+        setAttendance([]);
 
-    const savedDocuments = JSON.parse(localStorage.getItem('documents') || '[]');
-    setDocuments(savedDocuments);
-
-    const savedAssignments = JSON.parse(localStorage.getItem('assignments') || '[]');
-    setAssignments(savedAssignments);
-
-    const savedSubmissions = JSON.parse(localStorage.getItem('submissions') || '[]');
-    setSubmissions(savedSubmissions);
-
-    const savedStudents = JSON.parse(localStorage.getItem('approvedUsers') || '[]');
-    setStudents(savedStudents);
-
-    const savedAttendance = JSON.parse(localStorage.getItem('attendance') || '[]');
-    setAttendance(savedAttendance);
+        if (normalizedCourses[0]) {
+          await refreshCourseData(normalizedCourses[0]);
+        }
+      } catch (error) {
+        console.error('Failed to load teacher dashboard data', error);
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    if (selectedCourse?.courseId) {
+      refreshCourseData(selectedCourse);
+    }
+  }, [selectedCourse]);
 
   // Add system activity
   const addActivity = (action, type) => {
@@ -160,25 +247,28 @@ const TeacherDashboard = () => {
   // Add Video
   const handleAddVideo = () => {
     if (formData.title && (formData.link || formData.videoFile)) {
-      const newVideo = {
-        id: Date.now(),
-        courseId: selectedCourse?.id,
-        courseName: selectedCourse?.name,
-        title: formData.title,
-        description: formData.description,
-        link: formData.link,
-        videoFile: formData.videoFile || null,
-        videoFileName: formData.videoFileName || null,
-        date: new Date().toLocaleString(),
-        type: 'video'
-      };
-      const updated = [newVideo, ...videos];
-      setVideos(updated);
-      localStorage.setItem('videos', JSON.stringify(updated));
-      addActivity(`Added video: ${formData.title} for ${selectedCourse?.name}`, 'video');
-      setShowAddModal(false);
-      setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
-      alert('Video added successfully!');
+      api.request('/api/videos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          course: selectedCourse?.courseId,
+          title: formData.title,
+          description: formData.description,
+          videoUrl: formData.link,
+          duration: 0,
+        }),
+      })
+        .then(async () => {
+          addActivity(`Added video: ${formData.title} for ${selectedCourse?.name}`, 'video');
+          setShowAddModal(false);
+          setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
+          await refreshCourseData(selectedCourse);
+          alert('Video added successfully!');
+        })
+        .catch((error) => {
+          console.error(error);
+          alert(error?.message || 'Failed to add video');
+        });
     } else {
       alert('Please fill title and provide either a YouTube link or upload a video file');
     }
@@ -187,24 +277,27 @@ const TeacherDashboard = () => {
   // Add Document
   const handleAddDocument = () => {
     if (formData.title && formData.file) {
-      const newDocument = {
-        id: Date.now(),
-        courseId: selectedCourse?.id,
-        courseName: selectedCourse?.name,
-        title: formData.title,
-        description: formData.description,
-        file: formData.file,
-        fileName: formData.fileName,
-        date: new Date().toLocaleString(),
-        type: 'document'
-      };
-      const updated = [newDocument, ...documents];
-      setDocuments(updated);
-      localStorage.setItem('documents', JSON.stringify(updated));
-      addActivity(`Uploaded document: ${formData.title} for ${selectedCourse?.name}`, 'document');
-      setShowAddModal(false);
-      setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
-      alert('Document uploaded successfully!');
+      api.request('/api/materials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          course: selectedCourse?.courseId,
+          title: formData.title,
+          fileUrl: formData.file,
+          fileType: 'application/octet-stream',
+        }),
+      })
+        .then(async () => {
+          addActivity(`Uploaded document: ${formData.title} for ${selectedCourse?.name}`, 'document');
+          setShowAddModal(false);
+          setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
+          await refreshCourseData(selectedCourse);
+          alert('Document uploaded successfully!');
+        })
+        .catch((error) => {
+          console.error(error);
+          alert(error?.message || 'Failed to upload document');
+        });
     } else {
       alert('Please fill title and select a file');
     }
@@ -213,26 +306,24 @@ const TeacherDashboard = () => {
   // Add Assignment
   const handleAddAssignment = () => {
     if (formData.title && formData.dueDate && formData.totalMarks) {
-      const newAssignment = {
-        id: Date.now(),
-        courseId: selectedCourse?.id,
-        courseName: selectedCourse?.name,
+      api.createAssignment({
+        course: selectedCourse?.courseId,
         title: formData.title,
         description: formData.description,
         dueDate: formData.dueDate,
-        totalMarks: formData.totalMarks,
-        assignmentFile: formData.assignmentFile || null,
-        assignmentFileName: formData.assignmentFileName || null,
-        date: new Date().toLocaleString(),
-        type: 'assignment'
-      };
-      const updated = [newAssignment, ...assignments];
-      setAssignments(updated);
-      localStorage.setItem('assignments', JSON.stringify(updated));
-      addActivity(`Created assignment: ${formData.title} for ${selectedCourse?.name}`, 'assignment');
-      setShowAddModal(false);
-      setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
-      alert('Assignment created successfully!');
+        totalMarks: Number(formData.totalMarks),
+      })
+        .then(async () => {
+          addActivity(`Created assignment: ${formData.title} for ${selectedCourse?.name}`, 'assignment');
+          setShowAddModal(false);
+          setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
+          await refreshCourseData(selectedCourse);
+          alert('Assignment created successfully!');
+        })
+        .catch((error) => {
+          console.error(error);
+          alert(error?.message || 'Failed to create assignment');
+        });
     } else {
       alert('Please fill all required fields');
     }

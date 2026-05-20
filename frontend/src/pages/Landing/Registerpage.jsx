@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
+import api from '../../utils/api';
 
 const Registerpage = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Registerpage = () => {
   const [paymentSlipPreview, setPaymentSlipPreview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [courses, setCourses] = useState([]);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -23,6 +25,19 @@ const Registerpage = () => {
     transactionId: '',
     additionalNotes: ''
   });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await api.getAvailableCourses();
+        // backend returns { success, count, data: [...] }
+        const list = Array.isArray(data) ? data : data.data || data.courses || [];
+        setCourses(list);
+      } catch (err) {
+        console.error('Failed to load courses', err);
+      }
+    })();
+  }, []);
 
   const programs = [
     {
@@ -44,6 +59,16 @@ const Registerpage = () => {
       color: 'from-[#D4AF37] to-[#C49B2C]'
     }
   ];
+
+  const displayPrograms = courses.map((course) => ({
+    id: course._id,
+    title: course.title || course.name || 'Course',
+    duration: course.duration || '6 Months',
+    fee: course.fee !== undefined && course.fee !== null ? `Rs. ${course.fee}` : 'Rs. 45,000',
+    installment: course.installment || '',
+    icon: course.icon || '🎓',
+    color: course.color || 'from-[#0B1F3A] to-[#1A3A5A]'
+  }));
 
   const validateForm = () => {
     const newErrors = {};
@@ -159,19 +184,40 @@ const Registerpage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      setIsSubmitting(true);
-      
-      // Simulate form submission to backend
-      setTimeout(() => {
-        setIsSubmitting(false);
+    if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append('fullName', formData.fullName);
+      fd.append('email', formData.email);
+      fd.append('phone', formData.phone);
+      fd.append('whatsappNumber', formData.whatsapp || formData.phone);
+      fd.append('address', formData.address);
+      fd.append('nic', formData.nic);
+      fd.append('highestQualification', formData.qualification);
+      // selectedProgram should be the backend course id
+      const courseId = selectedProgram || (courses[0] && courses[0]._id) || '';
+      fd.append('courseId', courseId);
+      fd.append('paymentMethod', formData.paymentMethod);
+      fd.append('transactionId', formData.transactionId);
+      fd.append('notes', formData.additionalNotes || '');
+      if (paymentSlip) fd.append('paymentSlip', paymentSlip, paymentSlip.name);
+
+      const res = await api.registerStudent(fd);
+      if (res && (res.success || res.registrationId || res._id)) {
         alert('Registration submitted successfully! We will contact you within 24 hours.');
         navigate('/');
-      }, 2000);
-    } else {
-      // Scroll to top to show errors
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert(res.message || 'Registration failed. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error. Try again later.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -234,8 +280,13 @@ const Registerpage = () => {
             <h2 className="text-xl md:text-2xl font-bold text-[#0B1F3A] text-center mb-6 md:mb-8">
               Select Your Program
             </h2>
+            {displayPrograms.length === 0 ? (
+              <div className="bg-white rounded-2xl p-6 text-center border border-dashed border-[#D4AF37]/40 text-[#5A6A7A]">
+                No published courses are available yet. Please add and publish first.
+              </div>
+            ) : (
             <div className="grid md:grid-cols-2 gap-5 md:gap-6">
-              {programs.map((program) => (
+              {displayPrograms.map((program) => (
                 <div
                   key={program.id}
                   onClick={() => handleProgramSelect(program.id)}
@@ -276,6 +327,7 @@ const Registerpage = () => {
                 </div>
               ))}
             </div>
+            )}
             {errors.program && (
               <p className="text-red-500 text-xs mt-2 text-center">{errors.program}</p>
             )}

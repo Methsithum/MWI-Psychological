@@ -15,7 +15,7 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Invalid role');
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email }).select('+password').populate('course', 'title code');
 
   if (!user) {
     throw new ApiError(401, 'Invalid credentials');
@@ -48,6 +48,13 @@ const login = asyncHandler(async (req, res) => {
       role: user.role,
       status: user.status,
       forcePasswordChange: user.forcePasswordChange,
+      course: user.course
+        ? {
+            id: user.course._id,
+            title: user.course.title,
+            code: user.course.code,
+          }
+        : null,
     },
   });
 });
