@@ -1,5 +1,6 @@
 const multer = require('multer');
 const path = require('path');
+const ApiError = require('../utils/ApiError');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -25,7 +26,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Unsupported file type'), false);
+    cb(new ApiError(400, 'Unsupported file type'), false);
   }
 };
 
@@ -34,5 +35,23 @@ const upload = multer({
   fileFilter,
   limits: { fileSize: 1024 * 1024 * 500 },
 });
+
+const paymentSlipFileFilter = (req, file, cb) => {
+  const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new ApiError(400, 'Payment slip must be JPEG, PNG, or PDF'), false);
+  }
+};
+
+const paymentSlipUpload = multer({
+  storage,
+  fileFilter: paymentSlipFileFilter,
+  limits: { fileSize: 1024 * 1024 * 10 },
+});
+
+upload.paymentSlipUpload = paymentSlipUpload;
 
 module.exports = upload;
