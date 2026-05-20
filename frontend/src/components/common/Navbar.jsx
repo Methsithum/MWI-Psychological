@@ -81,7 +81,7 @@ const Navbar = () => {
 
           {/* AUTH BUTTONS - Modern Design */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link to="/login">
+            <Link to="/signin">
               <button className="px-5 py-2 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A] hover:text-amber-50 transition duration-300 font-medium text-sm">
                 Sign In
               </button>
@@ -173,7 +173,7 @@ const Navbar = () => {
 
             {/* MOBILE BUTTONS */}
             <div className="pt-5 space-y-3">
-              <Link to="/login" className="block" onClick={() => setIsOpen(false)}>
+              <Link to="/signin" className="block" onClick={() => setIsOpen(false)}>
                 <button className="w-full px-4 py-3 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A]/5 transition duration-300 font-medium">
                   Sign In
                 </button>
