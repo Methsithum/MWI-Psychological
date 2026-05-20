@@ -7,7 +7,7 @@ const createReport = asyncHandler(async (req, res) => {
 });
 
 const getReports = asyncHandler(async (req, res) => {
-  const reports = await Report.find().populate('generatedBy', 'firstName lastName email');
+  const reports = await Report.find().populate('generatedBy', 'fullName email');
   res.status(200).json({ success: true, count: reports.length, data: reports });
 });
 
