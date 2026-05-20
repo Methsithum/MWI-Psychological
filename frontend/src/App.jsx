@@ -15,6 +15,7 @@ import SignInpage from './components/auth/SignInpage';
 
 // Role-based dashboards (to be created)
 // import StudentDashboard from './pages/student/StudentDashboard';
+import StudentPortal from './pages/student/StudentPortal';
 // import LecturerDashboard from './pages/lecturer/LecturerDashboard';
 import TecherDasboard from './pages/teacher/TeacherDashboard';
 // import AdminDashboard from './pages/admin/AdminDashboard';
@@ -33,11 +34,12 @@ function App() {
         <Route path="/register" element={<Registerpage />} />
         
         {/* Auth Pages */}
-        <Route path="/login" element={<SignInpage />} />
+        <Route path="/signin" element={<SignInpage />} />
       
         
         {/* Protected Routes - To be added after signup */}
         {/* <Route path="/student/*" element={<StudentDashboard />} /> */}
+        <Route path="/student" element={<StudentPortal />} />
         {/* <Route path="/lecturer/*" element={<LecturerDashboard />} /> */}
         <Route path="/teacher" element={<TecherDasboard />} />
         {/* <Route path="/admin/*" element={<AdminDashboard />} /> */}
