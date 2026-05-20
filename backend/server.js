@@ -20,6 +20,7 @@ const submissionRoutes = require('./routes/submissionRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -50,6 +51,7 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/students', studentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
