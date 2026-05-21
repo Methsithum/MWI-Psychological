@@ -57,7 +57,7 @@ const StudentSettings = () => {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="bg-white rounded-3xl shadow-xl border border-[#D4AF37]/20 overflow-hidden">
-          <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] text-white px-6 sm:px-8 py-8">
+          <div className="bg-linear-to-r from-[#0B1F3A] to-[#1A3A5A] text-white px-6 sm:px-8 py-8">
             <h2 className="text-2xl font-bold">Settings</h2>
             <p className="text-white/70 mt-1">Change your password from here when needed</p>
           </div>
