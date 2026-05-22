@@ -470,41 +470,7 @@ const Registerpage = () => {
                 </div>
 
                 {/* Bank Details Section (Visible after request or can be shown directly) */}
-                <div className="bg-[#F8F4EC] rounded-xl p-4 md:p-5 mb-5">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-semibold text-[#0B1F3A] text-sm md:text-base">Bank Transfer Details</h4>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(`Bank: ${bankDetails.bankName}\nAccount Name: ${bankDetails.accountName}\nAccount Number: ${bankDetails.accountNumber}\nBranch: ${bankDetails.branch}\nFee: ${bankDetails.registrationFee}`)}
-                      className="flex items-center gap-1 text-xs text-[#D4AF37] hover:text-[#C49B2C] transition"
-                    >
-                      {copied ? <FaCheck size={12} /> : <FaCopy size={12} />}
-                      {copied ? 'Copied!' : 'Copy All'}
-                    </button>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <p className="flex justify-between flex-wrap gap-2">
-                      <span className="text-gray-600">Bank Name:</span>
-                      <span className="font-medium text-[#0B1F3A]">{bankDetails.bankName}</span>
-                    </p>
-                    <p className="flex justify-between flex-wrap gap-2">
-                      <span className="text-gray-600">Account Name:</span>
-                      <span className="font-medium text-[#0B1F3A]">{bankDetails.accountName}</span>
-                    </p>
-                    <p className="flex justify-between flex-wrap gap-2">
-                      <span className="text-gray-600">Account Number:</span>
-                      <span className="font-medium text-[#0B1F3A]">{bankDetails.accountNumber}</span>
-                    </p>
-                    <p className="flex justify-between flex-wrap gap-2">
-                      <span className="text-gray-600">Branch:</span>
-                      <span className="font-medium text-[#0B1F3A]">{bankDetails.branch}</span>
-                    </p>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-[#D4AF37]/20">
-                    <p className="text-[#D4AF37] font-semibold text-sm">Registration Fee: {bankDetails.registrationFee}</p>
-                    <p className="text-gray-500 text-xs mt-1">Pay the registration fee to confirm your seat</p>
-                  </div>
-                </div>
+                
 
                 <div className="grid md:grid-cols-2 gap-4 md:gap-5">
                   <div>
