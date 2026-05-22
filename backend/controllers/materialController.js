@@ -1,4 +1,5 @@
 const asyncHandler = require('../utils/asyncHandler');
+const ApiError = require('../utils/ApiError');
 const Material = require('../models/Material');
 
 const getMaterials = asyncHandler(async (req, res) => {
@@ -18,4 +19,23 @@ const uploadMaterial = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, message: 'Material uploaded', data: material });
 });
 
-module.exports = { getMaterials, uploadMaterial };
+const deleteMaterial = asyncHandler(async (req, res) => {
+  const material = await Material.findById(req.params.id);
+
+  if (!material) {
+    throw new ApiError(404, 'Material not found');
+  }
+
+  const isOwner = String(material.uploader) === String(req.user._id);
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isOwner && !isAdmin) {
+    throw new ApiError(403, 'You are not allowed to delete this material');
+  }
+
+  await Material.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({ success: true, message: 'Material deleted' });
+});
+
+module.exports = { getMaterials, uploadMaterial, deleteMaterial };

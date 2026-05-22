@@ -59,7 +59,7 @@ const TeacherDashboard = () => {
 
       setAssignments((assignmentsRes?.data || []).map((assignment, idx) => ({
         id: assignment._id || idx,
-        courseId: course.id,
+        courseId: course.courseId,
         title: assignment.title,
         description: assignment.description,
         dueDate: assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '',
@@ -68,7 +68,7 @@ const TeacherDashboard = () => {
 
       setVideos((videosRes?.data || []).map((video, idx) => ({
         id: video._id || idx,
-        courseId: course.id,
+        courseId: course.courseId,
         title: video.title,
         description: video.description || '',
         link: video.videoUrl || video.link || '#',
@@ -77,7 +77,7 @@ const TeacherDashboard = () => {
 
       setDocuments((materialsRes?.data || []).map((material, idx) => ({
         id: material._id || idx,
-        courseId: course.id,
+        courseId: course.courseId,
         title: material.title,
         fileName: material.fileUrl ? String(material.fileUrl).split('/').pop() : 'File',
         date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
@@ -110,14 +110,17 @@ const TeacherDashboard = () => {
         setSelectedCourse(normalizedCourses[0] || null);
 
         const notificationsRes = await api.getNotifications().catch(() => null);
-        setAnnouncements((notificationsRes?.data || []).map((notification, idx) => ({
-          id: notification._id || idx,
-          courseId: normalizedCourses[0]?.id || 1,
-          title: notification.title || notification.subject || 'Notification',
-          description: notification.message || notification.description || '',
-          link: notification.link || '',
-          date: notification.createdAt ? new Date(notification.createdAt).toLocaleString() : new Date().toLocaleString(),
-        })));
+        setAnnouncements((notificationsRes?.data || [])
+          .filter((notification) => notification.type === 'announcement')
+          .map((notification, idx) => ({
+            id: notification._id || idx,
+            groupId: notification.metadata?.announcementGroupId || notification._id || idx,
+            courseId: notification.metadata?.courseId || '',
+            title: notification.title || notification.metadata?.title || notification.subject || 'Notification',
+            description: notification.message || notification.description || '',
+            link: notification.link || notification.metadata?.link || '',
+            date: notification.createdAt ? new Date(notification.createdAt).toLocaleString() : new Date().toLocaleString(),
+          })));
 
         setSubmissions([]);
         setStudents([]);
@@ -175,70 +178,115 @@ const TeacherDashboard = () => {
 
   // Delete functions
   const handleDeleteAnnouncement = (id) => {
+    const announcement = announcements.find((item) => item.id === id);
+    if (!announcement) return;
+
     if (window.confirm('Are you sure you want to delete this announcement?')) {
-      const updated = announcements.filter(a => a.id !== id);
-      setAnnouncements(updated);
-      localStorage.setItem('announcements', JSON.stringify(updated));
-      addActivity(`Deleted announcement`, 'announcement');
-      alert('Announcement deleted successfully!');
+      api.deleteAnnouncement(announcement.groupId)
+        .then(async (response) => {
+          if (!response?.success) {
+            throw new Error(response?.message || 'Failed to delete announcement');
+          }
+          const updated = announcements.filter((item) => item.id !== id);
+          setAnnouncements(updated);
+          addActivity('Deleted announcement', 'announcement');
+          alert('Announcement deleted successfully!');
+        })
+        .catch((error) => {
+          console.error('Announcement deletion error:', error);
+          alert(error?.message || 'Failed to delete announcement');
+        });
     }
   };
 
   const handleDeleteVideo = (id) => {
     if (window.confirm('Are you sure you want to delete this video/session?')) {
-      const updated = videos.filter(v => v.id !== id);
-      setVideos(updated);
-      localStorage.setItem('videos', JSON.stringify(updated));
-      addActivity(`Deleted video/session`, 'video');
-      alert('Video/Session deleted successfully!');
+      api.deleteVideo(id)
+        .then(async (response) => {
+          if (!response?.success) {
+            throw new Error(response?.message || 'Failed to delete video');
+          }
+          addActivity('Deleted video/session', 'video');
+          await refreshCourseData(selectedCourse);
+          alert('Video/Session deleted successfully!');
+        })
+        .catch((error) => {
+          console.error('Video deletion error:', error);
+          alert(error?.message || 'Failed to delete video');
+        });
     }
   };
 
   const handleDeleteDocument = (id) => {
     if (window.confirm('Are you sure you want to delete this document?')) {
-      const updated = documents.filter(d => d.id !== id);
-      setDocuments(updated);
-      localStorage.setItem('documents', JSON.stringify(updated));
-      addActivity(`Deleted document`, 'document');
-      alert('Document deleted successfully!');
+      api.deleteMaterial(id)
+        .then(async (response) => {
+          if (!response?.success) {
+            throw new Error(response?.message || 'Failed to delete document');
+          }
+          addActivity('Deleted document', 'document');
+          await refreshCourseData(selectedCourse);
+          alert('Document deleted successfully!');
+        })
+        .catch((error) => {
+          console.error('Document deletion error:', error);
+          alert(error?.message || 'Failed to delete document');
+        });
     }
   };
 
   const handleDeleteAssignment = (id) => {
     if (window.confirm('Are you sure you want to delete this assignment? All student submissions will also be removed.')) {
-      const updated = assignments.filter(a => a.id !== id);
-      setAssignments(updated);
-      localStorage.setItem('assignments', JSON.stringify(updated));
-      
-      const updatedSubmissions = submissions.filter(s => s.assignmentId !== id);
-      setSubmissions(updatedSubmissions);
-      localStorage.setItem('submissions', JSON.stringify(updatedSubmissions));
-      
-      addActivity(`Deleted assignment`, 'assignment');
-      alert('Assignment deleted successfully!');
+      api.deleteAssignment(id)
+        .then(async (response) => {
+          if (!response?.success) {
+            throw new Error(response?.message || 'Failed to delete assignment');
+          }
+          addActivity('Deleted assignment', 'assignment');
+          await refreshCourseData(selectedCourse);
+          alert('Assignment deleted successfully!');
+        })
+        .catch((error) => {
+          console.error('Assignment deletion error:', error);
+          alert(error?.message || 'Failed to delete assignment');
+        });
     }
   };
 
   // Add Announcement
   const handleAddAnnouncement = () => {
     if (formData.title && formData.description) {
-      const newAnnouncement = {
-        id: Date.now(),
-        courseId: selectedCourse?.id,
-        courseName: selectedCourse?.name,
+      api.createAnnouncement({
+        courseId: selectedCourse?.courseId,
         title: formData.title,
         description: formData.description,
         link: formData.link,
-        date: new Date().toLocaleString(),
-        type: 'announcement'
-      };
-      const updated = [newAnnouncement, ...announcements];
-      setAnnouncements(updated);
-      localStorage.setItem('announcements', JSON.stringify(updated));
-      addActivity(`Added announcement: ${formData.title} for ${selectedCourse?.name}`, 'announcement');
-      setShowAddModal(false);
-      setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
-      alert('Announcement posted successfully!');
+      })
+        .then(async (response) => {
+          if (!response?.success) {
+            throw new Error(response?.message || 'Failed to post announcement');
+          }
+          addActivity(`Added announcement: ${formData.title} for ${selectedCourse?.name}`, 'announcement');
+          setShowAddModal(false);
+          setFormData({ title: '', description: '', link: '', dueDate: '', totalMarks: '', file: null, assignmentFile: null, videoFile: null });
+          const notificationsRes = await api.getNotifications().catch(() => null);
+          setAnnouncements((notificationsRes?.data || [])
+            .filter((notification) => notification.type === 'announcement')
+            .map((notification, idx) => ({
+              id: notification._id || idx,
+              groupId: notification.metadata?.announcementGroupId || notification._id || idx,
+              courseId: notification.metadata?.courseId || '',
+              title: notification.title || notification.metadata?.title || notification.subject || 'Notification',
+              description: notification.message || notification.description || '',
+              link: notification.link || notification.metadata?.link || '',
+              date: notification.createdAt ? new Date(notification.createdAt).toLocaleString() : new Date().toLocaleString(),
+            })));
+          alert('Announcement posted successfully!');
+        })
+        .catch((error) => {
+          console.error('Announcement creation error:', error);
+          alert(error?.message || 'Failed to post announcement');
+        });
     } else {
       alert('Please fill title and description');
     }
@@ -355,7 +403,7 @@ const TeacherDashboard = () => {
 
   const getStudentProgress = (studentId) => {
     const studentSubmissions = submissions.filter(s => s.studentId === studentId);
-    const totalAssignments = assignments.filter(a => a.courseId === selectedCourse?.id).length;
+    const totalAssignments = assignments.filter(a => String(a.courseId) === String(selectedCourse?.courseId)).length;
     const submittedCount = studentSubmissions.length;
     const averageScore = studentSubmissions.length > 0 
       ? (studentSubmissions.reduce((sum, s) => sum + (s.score || 0), 0) / studentSubmissions.length).toFixed(1)
@@ -475,10 +523,10 @@ const TeacherDashboard = () => {
                     <button onClick={() => { setModalType('announcement'); setShowAddModal(true); }} className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#D4AF37] text-[#0B1F3A] rounded-lg sm:rounded-xl font-semibold text-sm hover:bg-[#C49B2C] transition w-full sm:w-auto">+ Make Announcement</button>
                   </div>
                   <div className="space-y-3 sm:space-y-4">
-                    {announcements.filter(a => a.courseId === selectedCourse.id).length === 0 ? (
+                    {announcements.filter(a => String(a.courseId) === String(selectedCourse.courseId)).length === 0 ? (
                       <div className="bg-white rounded-xl p-6 sm:p-8 text-center"><p className="text-gray-500 text-sm">No announcements yet</p></div>
                     ) : (
-                      announcements.filter(a => a.courseId === selectedCourse.id).map(announcement => (
+                      announcements.filter(a => String(a.courseId) === String(selectedCourse.courseId)).map(announcement => (
                         <div key={announcement.id} className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 shadow-md border-l-4 border-[#D4AF37]">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                             <h3 className="font-bold text-[#0B1F3A] text-base sm:text-lg">{announcement.title}</h3>
@@ -504,10 +552,10 @@ const TeacherDashboard = () => {
                     <button onClick={() => { setModalType('video'); setShowAddModal(true); }} className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#D4AF37] text-[#0B1F3A] rounded-lg sm:rounded-xl font-semibold text-sm hover:bg-[#C49B2C] transition w-full sm:w-auto">+ Add Session/Video</button>
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:gap-5">
-                    {videos.filter(v => v.courseId === selectedCourse.id).length === 0 ? (
+                    {videos.filter(v => String(v.courseId) === String(selectedCourse.courseId)).length === 0 ? (
                       <div className="bg-white rounded-xl p-6 sm:p-8 text-center"><p className="text-gray-500 text-sm">No videos or sessions added yet</p></div>
                     ) : (
-                      videos.filter(v => v.courseId === selectedCourse.id).map(video => (
+                      videos.filter(v => String(v.courseId) === String(selectedCourse.courseId)).map(video => (
                         <div key={video.id} className="bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition p-4 sm:p-5">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                             <h3 className="font-bold text-[#0B1F3A] text-base sm:text-lg">{video.title}</h3>
@@ -540,10 +588,10 @@ const TeacherDashboard = () => {
                     <button onClick={() => { setModalType('document'); setShowAddModal(true); }} className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#D4AF37] text-[#0B1F3A] rounded-lg sm:rounded-xl font-semibold text-sm hover:bg-[#C49B2C] transition w-full sm:w-auto">+ Upload Document</button>
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                    {documents.filter(d => d.courseId === selectedCourse.id).length === 0 ? (
+                    {documents.filter(d => String(d.courseId) === String(selectedCourse.courseId)).length === 0 ? (
                       <div className="bg-white rounded-xl p-6 sm:p-8 text-center"><p className="text-gray-500 text-sm">No documents uploaded yet</p></div>
                     ) : (
-                      documents.filter(d => d.courseId === selectedCourse.id).map(doc => (
+                      documents.filter(d => String(d.courseId) === String(selectedCourse.courseId)).map(doc => (
                         <div key={doc.id} className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md flex flex-col sm:flex-row items-start sm:items-center gap-3">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#D4AF37]/10 rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-2xl">📄</div>
                           <div className="flex-1">
@@ -611,10 +659,10 @@ const TeacherDashboard = () => {
                     <button onClick={() => { setModalType('assignment'); setShowAddModal(true); }} className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#D4AF37] text-[#0B1F3A] rounded-lg sm:rounded-xl font-semibold text-sm hover:bg-[#C49B2C] transition w-full sm:w-auto">+ Create Assignment</button>
                   </div>
                   <div className="space-y-4 sm:space-y-5">
-                    {assignments.filter(a => a.courseId === selectedCourse.id).length === 0 ? (
+                    {assignments.filter(a => String(a.courseId) === String(selectedCourse.courseId)).length === 0 ? (
                       <div className="bg-white rounded-xl p-6 sm:p-8 text-center"><p className="text-gray-500 text-sm">No assignments created yet</p></div>
                     ) : (
-                      assignments.filter(a => a.courseId === selectedCourse.id).map(assignment => {
+                      assignments.filter(a => String(a.courseId) === String(selectedCourse.courseId)).map(assignment => {
                         const submissionsCount = submissions.filter(s => s.assignmentId === assignment.id).length;
                         return (
                           <div key={assignment.id} className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 shadow-md border border-[#D4AF37]/20">

@@ -122,6 +122,24 @@ export default {
     });
   },
 
+  async deleteAssignment(assignmentId) {
+    return request(`/api/assignments/${encodeURIComponent(assignmentId)}`, {
+      method: 'DELETE'
+    });
+  },
+
+  async deleteVideo(videoId) {
+    return request(`/api/videos/${encodeURIComponent(videoId)}`, {
+      method: 'DELETE'
+    });
+  },
+
+  async deleteMaterial(materialId) {
+    return request(`/api/materials/${encodeURIComponent(materialId)}`, {
+      method: 'DELETE'
+    });
+  },
+
   async markAttendance(payload) {
     return request('/api/attendance', {
       method: 'POST',
@@ -132,6 +150,20 @@ export default {
 
   async getNotifications() {
     return request('/api/notifications');
+  },
+
+  async createAnnouncement(payload) {
+    return request('/api/notifications/announcements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  },
+
+  async deleteAnnouncement(groupId) {
+    return request(`/api/notifications/announcements/${encodeURIComponent(groupId)}`, {
+      method: 'DELETE'
+    });
   },
 
   // formData must be a FormData (multipart) with field name 'paymentSlip' for file

@@ -1,4 +1,5 @@
 const asyncHandler = require('../utils/asyncHandler');
+const ApiError = require('../utils/ApiError');
 const Video = require('../models/Video');
 
 const getVideos = asyncHandler(async (req, res) => {
@@ -11,6 +12,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
     course: req.body.course,
     uploader: req.user._id,
     title: req.body.title,
+    description: req.body.description || '',
     videoUrl: req.file ? req.file.path : req.body.videoUrl,
     duration: req.body.duration || 0,
   });
@@ -18,4 +20,23 @@ const uploadVideo = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, message: 'Video uploaded', data: video });
 });
 
-module.exports = { getVideos, uploadVideo };
+const deleteVideo = asyncHandler(async (req, res) => {
+  const video = await Video.findById(req.params.id);
+
+  if (!video) {
+    throw new ApiError(404, 'Video not found');
+  }
+
+  const isOwner = String(video.uploader) === String(req.user._id);
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isOwner && !isAdmin) {
+    throw new ApiError(403, 'You are not allowed to delete this video');
+  }
+
+  await Video.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({ success: true, message: 'Video deleted' });
+});
+
+module.exports = { getVideos, uploadVideo, deleteVideo };

@@ -47,7 +47,7 @@ const StudentPortal = () => {
 
       setVideos((videosRes?.data || []).map((video, idx) => ({
         id: video._id || idx,
-        courseId: course.id,
+        courseId: course.courseId || course.id,
         title: video.title,
         description: video.description || '',
         link: video.videoUrl || video.link || '#',
@@ -56,7 +56,7 @@ const StudentPortal = () => {
 
       setDocuments((materialsRes?.data || []).map((material, idx) => ({
         id: material._id || idx,
-        courseId: course.id,
+        courseId: course.courseId || course.id,
         title: material.title,
         fileName: material.fileUrl ? String(material.fileUrl).split('/').pop() : 'File',
         date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
@@ -64,7 +64,7 @@ const StudentPortal = () => {
 
       setAssignments((assignmentsRes?.data || []).map((assignment, idx) => ({
         id: assignment._id || idx,
-        courseId: course.id,
+        courseId: course.courseId || course.id,
         title: assignment.title,
         description: assignment.description,
         dueDate: assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '',
@@ -78,12 +78,14 @@ const StudentPortal = () => {
         status: record.status || 'present',
       })));
 
-      setAnnouncements((notificationsRes?.data || []).map((notification, idx) => ({
+      setAnnouncements((notificationsRes?.data || [])
+        .filter((notification) => notification.type === 'announcement')
+        .map((notification, idx) => ({
         id: notification._id || idx,
-        courseId: course.id,
-        title: notification.title || notification.subject || 'Notification',
+        courseId: notification.metadata?.courseId || course.courseId || course.id,
+        title: notification.title || notification.metadata?.title || notification.subject || 'Notification',
         description: notification.message || notification.description || '',
-        link: notification.link || '',
+        link: notification.link || notification.metadata?.link || '',
         date: notification.createdAt ? new Date(notification.createdAt).toLocaleString() : new Date().toLocaleString(),
       })));
     } catch (error) {
@@ -206,7 +208,7 @@ const StudentPortal = () => {
   // Filter content by selected course
   const getCourseContent = (contentArray) => {
     if (!selectedCourse) return [];
-    return contentArray.filter(item => item.courseId === selectedCourse.id);
+    return contentArray.filter(item => String(item.courseId) === String(selectedCourse.courseId || selectedCourse.id));
   };
 
   // Get available courses for student
