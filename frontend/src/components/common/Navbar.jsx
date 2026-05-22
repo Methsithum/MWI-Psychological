@@ -16,7 +16,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center group">
               {/* Logo Image */}
-              <div className="w-10 h-10 md:w-15 md:h-15 relative">
+              <div className="w-10 h-10 md:w-15 md:h-15 relative space-y-5 mr-3">
                 <img 
                   src={logo} 
                   alt="PWI Psychological Logo"
@@ -27,7 +27,7 @@ const Navbar = () => {
               {/* Text Logo (fallback if image fails) */}
               <div className="hidden sm:block">
                 <span className="font-bold text-lg md:text-xl text-[#0B1F3A] tracking-wide">
-                  PWI Psychological
+                  MWI  මනෝවිද්‍යාත්මක ආයතනය
                 </span>
                 <span className="block text-[10px] md:text-xs text-[#D4AF37] font-semibold tracking-wider uppercase">
                   Professional Diploma Programmes

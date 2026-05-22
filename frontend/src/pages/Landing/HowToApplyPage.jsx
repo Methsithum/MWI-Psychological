@@ -95,7 +95,7 @@ const HowToApplyPage = () => {
           </h1>
           
           <p className="text-sm md:text-lg text-[#D1D8E0] max-w-2xl mx-auto">
-            Simple 6-step admission process to join PWI Psychological
+            Simple 6-step admission process to join MWI Psychological
           </p>
         </div>
       </section>
