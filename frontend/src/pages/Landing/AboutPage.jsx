@@ -42,11 +42,16 @@ const AboutPage = () => {
     }
   ];
 
+  // WhatsApp configuration
+  const whatsappNumber = "94768856172";
+  const whatsappMessage = "Hello! I'm interested in the psychology diploma programs at MWI Psychological. I would like to get more information about the courses and admission process.";
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <div className="min-h-screen bg-[#FCFAF5]">
       <Navbar />
 
-      {/* Hero Section - Mobile Responsive */}
+      {/* Hero Section */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-[#0B1F3A]">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-48 h-48 md:w-72 md:h-72 bg-[#D4AF37] rounded-full blur-3xl"></div>
@@ -75,7 +80,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Our Story Section - Mobile Responsive */}
+      {/* Our Story Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
@@ -141,7 +146,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Lecturer Section - Completely Redesigned */}
+      {/* Lecturer Section */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-white to-[#F8F4EC]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
@@ -159,9 +164,9 @@ const AboutPage = () => {
               <div className="lg:w-2/5 relative">
                 <div 
                   className="h-80 md:h-96 lg:h-full w-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${lecturerImage}` }}
+                  style={{ backgroundImage: `url(${lecturerImage})` }}
                 >
-                  <div className="absolute inset-0 "></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-l-2xl"></div>
                 </div>
                 
                 {/* Name Badge - Mobile */}
@@ -190,7 +195,7 @@ const AboutPage = () => {
                   counselling, mindfulness, and human behaviour studies.
                 </p>
 
-                {/* Qualifications - Accordion Style Cards */}
+                {/* Qualifications */}
                 <div className="mb-5 md:mb-6">
                   <h4 className="text-base md:text-lg font-bold text-[#0B1F3A] mb-3 flex items-center gap-2">
                     <span className="text-[#D4AF37] text-lg">📚</span>
@@ -226,19 +231,22 @@ const AboutPage = () => {
                   </div>
                 </div>
 
-                {/* Contact Card */}
+                {/* Contact Card with WhatsApp */}
                 <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#F5E6A8]/20 rounded-xl p-4 border border-[#D4AF37]/20">
                   <h4 className="font-bold text-[#0B1F3A] mb-2 text-sm md:text-base flex items-center gap-2">
                     <span>📞</span>
                     Contact Information
                   </h4>
-                  <div className="space-y-1.5">
-                    <p className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2 break-all">
+                  <div className="space-y-2">
+                    <a href="mailto:psychologicalinstitute351@gmail.com" className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2 break-all hover:text-[#D4AF37] transition">
                       <span>📧</span> psychologicalinstitute351@gmail.com
-                    </p>
-                    <p className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2">
-                      <span>📞</span> 076 885 6172 (WhatsApp & Registration)
-                    </p>
+                    </a>
+                    <a href="tel:+94768856172" className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2 hover:text-[#D4AF37] transition">
+                      <span>📞</span> 076 885 6172
+                    </a>
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-green-600 text-xs md:text-sm flex items-center gap-2 hover:text-green-700 transition">
+                      <span>💬</span> 076 885 6172 (WhatsApp)
+                    </a>
                   </div>
                 </div>
               </div>
@@ -247,7 +255,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Why Choose Us - Mobile Responsive */}
+      {/* Why Choose Us */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
@@ -282,7 +290,33 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* CTA Section - Mobile Responsive */}
+      {/* WhatsApp Contact Banner */}
+      <section className="py-12 bg-gradient-to-r from-green-600 to-green-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <div className="flex items-center gap-3 justify-center md:justify-start">
+                <span className="text-4xl">💬</span>
+                <div>
+                  <h3 className="text-white font-bold text-xl">Have Questions?</h3>
+                  <p className="text-green-100 text-sm">Chat with us directly on WhatsApp</p>
+                </div>
+              </div>
+            </div>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-3 bg-white text-green-600 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl"
+            >
+              <span className="text-xl">💬</span>
+              Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
       <section className="py-16 md:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0B1F3A] to-[#08162A]"></div>
         <div className="absolute inset-0 opacity-10">
@@ -298,17 +332,41 @@ const AboutPage = () => {
             <p className="text-sm md:text-base text-[#D1D8E0] mb-5 md:mb-8">
               Join our upcoming batch and begin your psychology education today
             </p>
-            <Link to="/register">
-              <button className="inline-flex items-center gap-2 px-5 md:px-8 py-2 md:py-3 bg-[#D4AF37] text-[#0B1F3A] rounded-full font-bold text-sm md:text-base hover:bg-[#C49B2C] hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-                Enroll Now
-                <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/register">
+                <button className="inline-flex items-center gap-2 px-5 md:px-8 py-2 md:py-3 bg-[#D4AF37] text-[#0B1F3A] rounded-full font-bold text-sm md:text-base hover:bg-[#C49B2C] hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                  Enroll Now
+                  <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </Link>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 md:px-8 py-2 md:py-3 bg-white/20 text-white rounded-full font-bold text-sm md:text-base hover:bg-white/30 transition-all duration-300"
+              >
+                <span>💬</span>
+                Chat on WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Floating WhatsApp Button */}
+      <a
+        href={whatsappLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-600 transition-all duration-300 hover:scale-110 group"
+      >
+        <span className="text-2xl">💬</span>
+        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+          Chat with us
+        </span>
+      </a>
 
       <Footer />
     </div>
