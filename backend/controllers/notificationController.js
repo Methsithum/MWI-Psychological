@@ -26,10 +26,12 @@ const createAnnouncement = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Course not found');
   }
 
-  const isTeacherOwner = req.user.role === 'teacher' && String(course.teacher) === String(req.user._id);
+  // Allow admins and teachers to create announcements.
+  // Previously only the course owner teacher could post; relax to let any teacher post announcements.
   const isAdmin = req.user.role === 'admin';
+  const isTeacher = req.user.role === 'teacher';
 
-  if (!isTeacherOwner && !isAdmin) {
+  if (!isAdmin && !isTeacher) {
     throw new ApiError(403, 'You are not allowed to post announcements for this course');
   }
 

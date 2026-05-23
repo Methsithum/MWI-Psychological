@@ -4,7 +4,12 @@ const Assignment = require('../models/Assignment');
 const Submission = require('../models/Submission');
 
 const createAssignment = asyncHandler(async (req, res) => {
-  const assignment = await Assignment.create({ ...req.body, teacher: req.user._id });
+  const assignment = await Assignment.create({
+    ...req.body,
+    teacher: req.user._id,
+    attachmentUrl: req.file ? `/uploads/${req.file.filename}` : (req.body.attachmentUrl || ''),
+    attachmentName: req.file ? req.file.originalname : (req.body.attachmentName || ''),
+  });
   res.status(201).json({ success: true, message: 'Assignment created', data: assignment });
 });
 

@@ -1,6 +1,48 @@
 const BASE = import.meta.env.VITE_API_BASE || '';
 import auth from './auth';
 
+const ABSOLUTE_URL = /^https?:\/\//i;
+
+function resolveFileUrl(path) {
+  if (!path) return '';
+
+  const input = String(path);
+  if (ABSOLUTE_URL.test(input) || input.startsWith('data:') || input.startsWith('blob:')) {
+    return input;
+  }
+
+  const normalized = input.replace(/\\/g, '/');
+  if (normalized.startsWith('/')) {
+    return `${BASE}${normalized}`;
+  }
+
+  return `${BASE}/${normalized}`;
+}
+
+async function downloadFile(path, fileName = 'download') {
+  const resolvedUrl = resolveFileUrl(path);
+  if (!resolvedUrl) {
+    throw new Error('File URL is not available');
+  }
+
+  const response = await fetch(resolvedUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to download file (${response.status})`);
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(objectUrl);
+}
+
 async function request(path, options = {}) {
   const headers = options.headers || {};
   const token = auth.getToken();
@@ -16,6 +58,8 @@ async function request(path, options = {}) {
 
 export default {
   request,
+  resolveFileUrl,
+  downloadFile,
 
   async getCourses() {
     return request('/api/courses');
@@ -114,6 +158,14 @@ export default {
     }).then((res) => res.json());
   },
 
+  async uploadAssignment(formData) {
+    return fetch(`${BASE}/api/assignments`, {
+      method: 'POST',
+      headers: { ...(auth.getToken() ? { Authorization: `Bearer ${auth.getToken()}` } : {}) },
+      body: formData
+    }).then((res) => res.json());
+  },
+
   async createAssignment(payload) {
     return request('/api/assignments', {
       method: 'POST',
@@ -137,6 +189,31 @@ export default {
   async deleteMaterial(materialId) {
     return request(`/api/materials/${encodeURIComponent(materialId)}`, {
       method: 'DELETE'
+    });
+  },
+
+  async submitAssignment(formData) {
+    return fetch(`${BASE}/api/submissions`, {
+      method: 'POST',
+      headers: { ...(auth.getToken() ? { Authorization: `Bearer ${auth.getToken()}` } : {}) },
+      body: formData
+    }).then((res) => res.json());
+  },
+
+  async getAssignmentSubmissions(assignmentId) {
+    return request(`/api/submissions/assignment/${encodeURIComponent(assignmentId)}`);
+  },
+
+  async getMySubmissions(courseId) {
+    const qs = courseId ? `?courseId=${encodeURIComponent(courseId)}` : '';
+    return request(`/api/submissions/student/me${qs}`);
+  },
+
+  async gradeSubmission(submissionId, grade) {
+    return request(`/api/submissions/${encodeURIComponent(submissionId)}/grade`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grade })
     });
   },
 

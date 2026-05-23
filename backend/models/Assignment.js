@@ -7,7 +7,9 @@ const assignmentSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true },
     dueDate: { type: Date, required: true },
+    totalMarks: { type: Number, default: 0 },
     attachmentUrl: { type: String, default: '' },
+    attachmentName: { type: String, default: '' },
   },
   { timestamps: true }
 );

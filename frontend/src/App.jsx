@@ -20,6 +20,7 @@ import StudentProfile from './pages/student/StudentProfile';
 import StudentSettings from './pages/student/StudentSettings';
 // import LecturerDashboard from './pages/lecturer/LecturerDashboard';
 import TecherDasboard from './pages/teacher/TeacherDashboard';
+import SubmissionReviewPage from './pages/teacher/SubmissionReviewPage';
 // import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
@@ -46,6 +47,7 @@ function App() {
         <Route path="/student/settings" element={<StudentSettings />} />
         {/* <Route path="/lecturer/*" element={<LecturerDashboard />} /> */}
         <Route path="/teacher" element={<TecherDasboard />} />
+        <Route path="/teacher/assignments/:assignmentId/submissions" element={<SubmissionReviewPage />} />
         {/* <Route path="/admin/*" element={<AdminDashboard />} /> */}
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>

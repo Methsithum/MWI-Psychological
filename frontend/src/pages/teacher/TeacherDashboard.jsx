@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 
@@ -15,8 +15,10 @@ const TeacherDashboard = () => {
   const [submissions, setSubmissions] = useState([]);
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const [attendanceDateFilter, setAttendanceDateFilter] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [modalType, setModalType] = useState('');
+  const initialLoadRef = useRef(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -57,14 +59,39 @@ const TeacherDashboard = () => {
         status: registration.status || 'approved',
       })));
 
-      setAssignments((assignmentsRes?.data || []).map((assignment, idx) => ({
+      const assignmentItems = (assignmentsRes?.data || []).map((assignment, idx) => ({
         id: assignment._id || idx,
         courseId: course.courseId,
         title: assignment.title,
         description: assignment.description,
         dueDate: assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '',
         totalMarks: assignment.totalMarks || 0,
-      })));
+        date: assignment.createdAt ? new Date(assignment.createdAt).toLocaleDateString() : '',
+        attachmentUrl: assignment.attachmentUrl ? String(assignment.attachmentUrl).replace(/\\/g, '/') : '',
+        attachmentName: assignment.attachmentName || '',
+      }));
+      setAssignments(assignmentItems);
+
+      const submissionsByAssignment = await Promise.all(
+        assignmentItems.map((assignment) => api.getAssignmentSubmissions(assignment.id).catch(() => ({ data: [] })))
+      );
+
+      const normalizedSubmissions = submissionsByAssignment.flatMap((response, index) => {
+        const assignmentId = assignmentItems[index]?.id;
+
+        return (response?.data || []).map((submission, subIndex) => ({
+          id: submission._id || `${assignmentId}-${subIndex}`,
+          assignmentId,
+          studentId: submission.student?._id || submission.student,
+          fileUrl: submission.fileUrl ? String(submission.fileUrl).replace(/\\/g, '/') : '',
+          fileName: submission.fileName || (submission.fileUrl ? String(submission.fileUrl).split('/').pop() : ''),
+          remarks: submission.remarks || '',
+          score: submission.grade ? Number(submission.grade) : null,
+          submittedDate: submission.submittedAt ? new Date(submission.submittedAt).toLocaleString() : (submission.createdAt ? new Date(submission.createdAt).toLocaleString() : ''),
+        }));
+      });
+
+      setSubmissions(normalizedSubmissions);
 
       setVideos((videosRes?.data || []).map((video, idx) => ({
         id: video._id || idx,
@@ -75,22 +102,33 @@ const TeacherDashboard = () => {
         date: video.createdAt ? new Date(video.createdAt).toLocaleDateString() : '',
       })));
 
-      setDocuments((materialsRes?.data || []).map((material, idx) => ({
-        id: material._id || idx,
-        courseId: course.courseId,
-        title: material.title,
-        fileName: material.fileUrl ? String(material.fileUrl).split('/').pop() : 'File',
-        date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
-      })));
+      setDocuments((materialsRes?.data || []).map((material, idx) => {
+        const normalizedFileUrl = material.fileUrl ? String(material.fileUrl).replace(/\\/g, '/') : '';
+        const fallbackName = normalizedFileUrl ? normalizedFileUrl.split('/').pop() : 'File';
 
-      setAttendance((attendanceRes?.data || []).map((record, idx) => ({
-        id: record._id || idx,
-        studentId: record.student?._id || record.student || idx,
-        date: record.date ? new Date(record.date).toLocaleString() : new Date(record.createdAt).toLocaleString(),
-        status: record.status || 'present',
-      })));
+        return {
+          id: material._id || idx,
+          courseId: course.courseId,
+          title: material.title,
+          fileUrl: normalizedFileUrl,
+          fileName: material.fileName || fallbackName,
+          date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
+        };
+      }));
+
+      setAttendance((attendanceRes?.data || []).map((record, idx) => {
+        const sourceDate = record.date || record.createdAt;
+        return {
+          id: record._id || idx,
+          studentId: record.student?._id || record.student || idx,
+          date: sourceDate,
+          displayDate: sourceDate ? new Date(sourceDate).toLocaleString() : '',
+          status: record.status || 'present',
+        };
+      }));
     } catch (error) {
       console.error('Failed to load course data', error);
+      setSubmissions([]);
       setStudents([]);
       setAssignments([]);
       setVideos([]);
@@ -101,10 +139,24 @@ const TeacherDashboard = () => {
 
   // Load data from localStorage
   useEffect(() => {
+    if (initialLoadRef.current) return;
+    initialLoadRef.current = true;
+
     (async () => {
       try {
-        const coursesRes = await api.getCourses();
-        const backendCourses = Array.isArray(coursesRes?.data) ? coursesRes.data : [];
+        const [availableCoursesRes, allCoursesRes] = await Promise.allSettled([
+          api.getAvailableCourses(),
+          api.getCourses(),
+        ]);
+
+        const availableCourses = availableCoursesRes.status === 'fulfilled' && Array.isArray(availableCoursesRes.value?.data)
+          ? availableCoursesRes.value.data
+          : [];
+        const allCourses = allCoursesRes.status === 'fulfilled' && Array.isArray(allCoursesRes.value?.data)
+          ? allCoursesRes.value.data
+          : [];
+
+        const backendCourses = availableCourses.length > 0 ? availableCourses : allCourses;
         const normalizedCourses = backendCourses.map((course, index) => normalizeCourse(course, index));
         setCourses(normalizedCourses);
         setSelectedCourse(normalizedCourses[0] || null);
@@ -128,10 +180,6 @@ const TeacherDashboard = () => {
         setVideos([]);
         setAssignments([]);
         setAttendance([]);
-
-        if (normalizedCourses[0]) {
-          await refreshCourseData(normalizedCourses[0]);
-        }
       } catch (error) {
         console.error('Failed to load teacher dashboard data', error);
       }
@@ -162,14 +210,22 @@ const TeacherDashboard = () => {
   const handleFileUpload = (e, type = 'document') => {
     const file = e.target.files[0];
     if (file) {
+      if (type === 'document') {
+        setFormData((prev) => ({ ...prev, file, fileName: file.name }));
+        return;
+      }
+
+      if (type === 'assignment') {
+        setFormData((prev) => ({ ...prev, assignmentFile: file, assignmentFileName: file.name }));
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (type === 'assignment') {
-          setFormData({ ...formData, assignmentFile: reader.result, assignmentFileName: file.name });
-        } else if (type === 'video') {
-          setFormData({ ...formData, videoFile: reader.result, videoFileName: file.name });
+        if (type === 'video') {
+          setFormData((prev) => ({ ...prev, videoFile: reader.result, videoFileName: file.name }));
         } else {
-          setFormData({ ...formData, file: reader.result, fileName: file.name });
+          setFormData((prev) => ({ ...prev, file: reader.result, fileName: file.name }));
         }
       };
       reader.readAsDataURL(file);
@@ -325,16 +381,12 @@ const TeacherDashboard = () => {
   // Add Document
   const handleAddDocument = () => {
     if (formData.title && formData.file) {
-      api.request('/api/materials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          course: selectedCourse?.courseId,
-          title: formData.title,
-          fileUrl: formData.file,
-          fileType: 'application/octet-stream',
-        }),
-      })
+      const payload = new FormData();
+      payload.append('course', selectedCourse?.courseId || '');
+      payload.append('title', formData.title);
+      payload.append('file', formData.file, formData.fileName || formData.file.name || 'document');
+
+      api.uploadMaterial(payload)
         .then(async () => {
           addActivity(`Uploaded document: ${formData.title} for ${selectedCourse?.name}`, 'document');
           setShowAddModal(false);
@@ -354,13 +406,17 @@ const TeacherDashboard = () => {
   // Add Assignment
   const handleAddAssignment = () => {
     if (formData.title && formData.dueDate && formData.totalMarks) {
-      api.createAssignment({
-        course: selectedCourse?.courseId,
-        title: formData.title,
-        description: formData.description,
-        dueDate: formData.dueDate,
-        totalMarks: Number(formData.totalMarks),
-      })
+      const payload = new FormData();
+      payload.append('course', selectedCourse?.courseId || '');
+      payload.append('title', formData.title);
+      payload.append('description', formData.description || '');
+      payload.append('dueDate', formData.dueDate);
+      payload.append('totalMarks', String(Number(formData.totalMarks)));
+      if (formData.assignmentFile) {
+        payload.append('file', formData.assignmentFile, formData.assignmentFileName || formData.assignmentFile.name || 'assignment');
+      }
+
+      api.uploadAssignment(payload)
         .then(async () => {
           addActivity(`Created assignment: ${formData.title} for ${selectedCourse?.name}`, 'assignment');
           setShowAddModal(false);
@@ -378,27 +434,55 @@ const TeacherDashboard = () => {
   };
 
   const viewSubmissions = (assignmentId, assignmentTitle, totalMarks) => {
-    const assignmentSubmissions = submissions.filter(s => s.assignmentId === assignmentId);
-    if (assignmentSubmissions.length === 0) {
-      alert(`No submissions yet for "${assignmentTitle}"`);
-    } else {
-      let message = `Submissions for "${assignmentTitle}":\n\n`;
-      assignmentSubmissions.forEach(s => {
-        const student = students.find(st => st.id === s.studentId);
-        message += `${student?.fullName}: ${s.score || 'Not graded'}/${totalMarks}\n`;
-        if (s.file) message += `  📎 File attached\n`;
-      });
-      alert(message);
-    }
+    navigate(`/teacher/assignments/${assignmentId}/submissions`, {
+      state: {
+        assignmentTitle,
+        totalMarks,
+        courseId: selectedCourse?.courseId,
+      },
+    });
+  };
+
+  const getAttendanceBadgeStyle = (status) => {
+    if (status === 'late') return 'bg-yellow-100 text-yellow-700';
+    if (status === 'absent') return 'bg-red-100 text-red-700';
+    return 'bg-green-100 text-green-700';
+  };
+
+  const getAttendanceFilterDate = () => {
+    if (!attendanceDateFilter) return null;
+    const parsed = new Date(attendanceDateFilter);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toDateString();
+  };
+
+  const getFilteredAttendance = () => {
+    const filterDate = getAttendanceFilterDate();
+    if (!filterDate) return attendance;
+
+    return attendance.filter((record) => {
+      if (!record.date) return false;
+      return new Date(record.date).toDateString() === filterDate;
+    });
   };
 
   const getAttendanceStats = () => {
     const totalStudents = students.length;
-    const presentToday = attendance.filter(a => {
-      const today = new Date().toDateString();
-      return new Date(a.date).toDateString() === today;
-    }).length;
-    return { totalStudents, presentToday, attendanceRate: totalStudents ? ((presentToday / totalStudents) * 100).toFixed(1) : 0 };
+    const todayStatusByStudent = new Map();
+    const filteredAttendance = getFilteredAttendance();
+
+    filteredAttendance.forEach((record) => {
+      if (record.date) {
+        todayStatusByStudent.set(String(record.studentId), record.status || 'present');
+      }
+    });
+
+    const presentToday = Array.from(todayStatusByStudent.values()).filter((status) => status === 'present' || status === 'late').length;
+    return {
+      totalStudents,
+      presentToday,
+      attendanceRate: totalStudents ? ((presentToday / totalStudents) * 100).toFixed(1) : 0,
+      recordCount: filteredAttendance.length,
+    };
   };
 
   const getStudentProgress = (studentId) => {
@@ -599,7 +683,7 @@ const TeacherDashboard = () => {
                             <p className="text-[10px] sm:text-xs text-gray-400">{doc.date}</p>
                           </div>
                           <div className="flex items-center gap-2 w-full sm:w-auto">
-                            <button onClick={() => { const link = document.createElement('a'); link.href = doc.file; link.download = doc.fileName; link.click(); }} className="flex-1 sm:flex-none px-2 py-1 sm:px-3 sm:py-1.5 bg-[#D4AF37] text-[#0B1F3A] rounded-lg text-xs font-semibold">Download</button>
+                            <button onClick={() => { api.downloadFile(doc.fileUrl, doc.fileName || 'document').catch((error) => { alert(error?.message || 'Failed to download file'); }); }} className="flex-1 sm:flex-none px-2 py-1 sm:px-3 sm:py-1.5 bg-[#D4AF37] text-[#0B1F3A] rounded-lg text-xs font-semibold">Download</button>
                             <button onClick={() => handleDeleteDocument(doc.id)} className="flex-1 sm:flex-none px-2 py-1 sm:px-3 sm:py-1.5 bg-red-500 text-white rounded-lg text-xs font-semibold hover:bg-red-600 transition">Delete</button>
                           </div>
                         </div>
@@ -615,11 +699,25 @@ const TeacherDashboard = () => {
                   <h2 className="text-xl sm:text-2xl font-bold text-[#0B1F3A] mb-4 sm:mb-6">Attendance Overview</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
                     <div className="bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white"><p className="text-xs sm:text-sm opacity-90">Total Students</p><p className="text-2xl sm:text-3xl font-bold mt-1">{attendanceStats.totalStudents}</p></div>
-                    <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white"><p className="text-xs sm:text-sm opacity-90">Present Today</p><p className="text-2xl sm:text-3xl font-bold mt-1">{attendanceStats.presentToday}</p></div>
-                    <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white"><p className="text-xs sm:text-sm opacity-90">Today's Rate</p><p className="text-2xl sm:text-3xl font-bold mt-1">{attendanceStats.attendanceRate}%</p></div>
+                    <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white"><p className="text-xs sm:text-sm opacity-90">Present Count</p><p className="text-2xl sm:text-3xl font-bold mt-1">{attendanceStats.presentToday}</p></div>
+                    <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white"><p className="text-xs sm:text-sm opacity-90">Records Shown</p><p className="text-2xl sm:text-3xl font-bold mt-1">{attendanceStats.recordCount}</p></div>
                   </div>
                   <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 overflow-x-auto">
-                    <h3 className="text-base sm:text-lg font-bold text-[#0B1F3A] mb-3 sm:mb-4">Recent Attendance Records</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-3 sm:mb-4">
+                      <div>
+                        <h3 className="text-base sm:text-lg font-bold text-[#0B1F3A]">Attendance Records</h3>
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1">Filter by date to review a specific day's attendance.</p>
+                      </div>
+                      <div className="w-full sm:w-64">
+                        <label className="block text-xs font-medium text-[#0B1F3A] mb-1">Filter by date</label>
+                        <input
+                          type="date"
+                          value={attendanceDateFilter}
+                          onChange={(e) => setAttendanceDateFilter(e.target.value)}
+                          className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D4AF37]"
+                        />
+                      </div>
+                    </div>
                     <table className="w-full min-w-[400px]">
                       <thead className="bg-[#F8F4EC]">
                         <tr>
@@ -629,24 +727,23 @@ const TeacherDashboard = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {attendance.slice(0, 10).map(record => {
-                          const student = students.find(s => s.id === record.studentId);
+                        {getFilteredAttendance().slice(0, 10).map(record => {
+                          const student = students.find((s) => String(s.id) === String(record.studentId));
                           return (
                             <tr key={record.id} className="border-b border-gray-100">
                               <td className="p-2 sm:p-3 text-xs sm:text-sm">{student?.fullName || 'Unknown'}</td>
-                              <td className="p-2 sm:p-3 text-xs sm:text-sm">{record.date}</td>
-                              <td className="p-2 sm:p-3 text-xs sm:text-sm"><span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-xs">Present</span></td>
+                              <td className="p-2 sm:p-3 text-xs sm:text-sm">{record.displayDate || (record.date ? new Date(record.date).toLocaleString() : '')}</td>
+                              <td className="p-2 sm:p-3 text-xs sm:text-sm"><span className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-[10px] sm:text-xs ${getAttendanceBadgeStyle(record.status)}`}>{record.status}</span></td>
                             </tr>
                           );
                         })}
-                        {attendance.length === 0 && (
+                        {getFilteredAttendance().length === 0 && (
                           <tr>
-                            <td colSpan="3" className="text-center p-6 sm:p-8 text-gray-500 text-sm">No attendance records yet</td>
+                            <td colSpan="3" className="text-center p-6 sm:p-8 text-gray-500 text-sm">No attendance records found for the selected date</td>
                           </tr>
                         )}
                       </tbody>
                     </table>
-                    <p className="text-[10px] sm:text-xs text-gray-400 mt-4 text-center">* Attendance is automatically marked when students log into their dashboard</p>
                   </div>
                 </div>
               )}
@@ -677,8 +774,8 @@ const TeacherDashboard = () => {
                               </div>
                             </div>
                             <p className="text-gray-600 text-xs sm:text-sm mb-3">{assignment.description}</p>
-                            {assignment.assignmentFile && (
-                              <div className="mb-3"><button onClick={() => { const link = document.createElement('a'); link.href = assignment.assignmentFile; link.download = assignment.assignmentFileName; link.click(); }} className="text-[#D4AF37] text-xs sm:text-sm flex items-center gap-1 hover:underline">📎 Download Assignment File</button></div>
+                            {assignment.attachmentUrl && (
+                              <div className="mb-3"><button onClick={() => { api.downloadFile(assignment.attachmentUrl, assignment.attachmentName || 'assignment').catch((error) => { alert(error?.message || 'Failed to download assignment file'); }); }} className="text-[#D4AF37] text-xs sm:text-sm flex items-center gap-1 hover:underline">📎 Download Assignment File</button></div>
                             )}
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                               <div className="flex gap-3"><span className="text-[10px] sm:text-xs text-gray-500">📝 Total Marks: {assignment.totalMarks}</span><span className="text-[10px] sm:text-xs text-gray-500">📤 Submissions: {submissionsCount}</span></div>

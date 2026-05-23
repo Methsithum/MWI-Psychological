@@ -12,6 +12,7 @@ const StudentPortal = () => {
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [submissionFile, setSubmissionFile] = useState(null);
   const [submissionText, setSubmissionText] = useState('');
+  const [attendanceSubmitting, setAttendanceSubmitting] = useState(false);
 
   const [student, setStudent] = useState(() => {
     const user = auth.getUser();
@@ -37,12 +38,13 @@ const StudentPortal = () => {
   const loadCourseContent = async (course) => {
     if (!course?.courseId) return;
     try {
-      const [videosRes, materialsRes, assignmentsRes, attendanceRes, notificationsRes] = await Promise.all([
+      const [videosRes, materialsRes, assignmentsRes, attendanceRes, notificationsRes, submissionsRes] = await Promise.all([
         api.getCourseVideos(course.courseId),
         api.getCourseMaterials(course.courseId),
         api.getCourseAssignments(course.courseId),
         api.getCourseAttendance(course.courseId),
         api.getNotifications().catch(() => null),
+        api.getMySubmissions(course.courseId).catch(() => ({ data: [] })),
       ]);
 
       setVideos((videosRes?.data || []).map((video, idx) => ({
@@ -54,13 +56,19 @@ const StudentPortal = () => {
         date: video.createdAt ? new Date(video.createdAt).toLocaleDateString() : '',
       })));
 
-      setDocuments((materialsRes?.data || []).map((material, idx) => ({
-        id: material._id || idx,
-        courseId: course.courseId || course.id,
-        title: material.title,
-        fileName: material.fileUrl ? String(material.fileUrl).split('/').pop() : 'File',
-        date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
-      })));
+      setDocuments((materialsRes?.data || []).map((material, idx) => {
+        const normalizedFileUrl = material.fileUrl ? String(material.fileUrl).replace(/\\/g, '/') : '';
+        const fallbackName = normalizedFileUrl ? normalizedFileUrl.split('/').pop() : 'File';
+
+        return {
+          id: material._id || idx,
+          courseId: course.courseId || course.id,
+          title: material.title,
+          fileUrl: normalizedFileUrl,
+          fileName: material.fileName || fallbackName,
+          date: material.createdAt ? new Date(material.createdAt).toLocaleDateString() : '',
+        };
+      }));
 
       setAssignments((assignmentsRes?.data || []).map((assignment, idx) => ({
         id: assignment._id || idx,
@@ -69,14 +77,33 @@ const StudentPortal = () => {
         description: assignment.description,
         dueDate: assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '',
         totalMarks: assignment.totalMarks || 0,
+        attachmentUrl: assignment.attachmentUrl ? String(assignment.attachmentUrl).replace(/\\/g, '/') : '',
+        attachmentName: assignment.attachmentName || '',
       })));
 
-      setAttendance((attendanceRes?.data || []).map((record, idx) => ({
-        id: record._id || idx,
-        studentId: record.student?._id || record.student || idx,
-        date: record.date ? new Date(record.date).toLocaleString() : new Date(record.createdAt).toLocaleString(),
-        status: record.status || 'present',
+      setSubmissions((submissionsRes?.data || []).map((submission, idx) => ({
+        id: submission._id || idx,
+        assignmentId: submission.assignment?._id || submission.assignment,
+        studentId: submission.student?._id || submission.student || student.id,
+        studentName: student.fullName,
+        submissionText: submission.remarks || '',
+        fileUrl: submission.fileUrl ? String(submission.fileUrl).replace(/\\/g, '/') : '',
+        fileName: submission.fileName || (submission.fileUrl ? String(submission.fileUrl).split('/').pop() : ''),
+        submittedDate: submission.submittedAt ? new Date(submission.submittedAt).toLocaleString() : (submission.createdAt ? new Date(submission.createdAt).toLocaleString() : ''),
+        score: submission.grade ? Number(submission.grade) : null,
+        status: 'submitted',
       })));
+
+      setAttendance((attendanceRes?.data || []).map((record, idx) => {
+        const sourceDate = record.date || record.createdAt;
+        return {
+          id: record._id || idx,
+          studentId: record.student?._id || record.student || idx,
+          date: sourceDate,
+          displayDate: sourceDate ? new Date(sourceDate).toLocaleString() : '',
+          status: record.status || 'present',
+        };
+      }));
 
       setAnnouncements((notificationsRes?.data || [])
         .filter((notification) => notification.type === 'announcement')
@@ -90,6 +117,7 @@ const StudentPortal = () => {
       })));
     } catch (error) {
       console.error('Failed to load course content', error);
+      setSubmissions([]);
       setVideos([]);
       setDocuments([]);
       setAssignments([]);
@@ -153,48 +181,52 @@ const StudentPortal = () => {
   }, [selectedCourse]);
 
   // Handle assignment submission
-  const handleSubmitAssignment = () => {
+  const handleSubmitAssignment = async () => {
     if (!submissionFile && !submissionText) {
       alert('Please upload a file or enter your submission text');
       return;
     }
 
-    const newSubmission = {
-      id: Date.now(),
-      assignmentId: selectedAssignment.id,
-      studentId: student.id,
-      studentName: student.fullName,
-      submissionText: submissionText,
-      file: submissionFile,
-      fileName: submissionFile?.name,
-      submittedDate: new Date().toLocaleString(),
-      score: null,
-      status: 'submitted'
-    };
+    try {
+      const payload = new FormData();
+      payload.append('assignment', selectedAssignment.id);
+      payload.append('remarks', submissionText || '');
+      if (submissionFile) {
+        payload.append('file', submissionFile, submissionFile.name || 'submission');
+      }
 
-    setSubmissions([...submissions, newSubmission]);
-    alert('Assignment submitted successfully!');
-    setShowSubmitModal(false);
-    setSubmissionFile(null);
-    setSubmissionText('');
+      const response = await api.submitAssignment(payload);
+      if (!response?.success) {
+        throw new Error(response?.message || 'Failed to submit assignment');
+      }
+
+      alert('Assignment submitted successfully!');
+      setShowSubmitModal(false);
+      setSubmissionFile(null);
+      setSubmissionText('');
+      await loadCourseContent(selectedCourse);
+    } catch (error) {
+      console.error('Assignment submission error:', error);
+      alert(error?.message || 'Failed to submit assignment');
+    }
   };
 
   // Handle file upload for submission
   const handleSubmissionFile = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSubmissionFile({ data: 'mock-data', name: file.name });
+      setSubmissionFile(file);
     }
   };
 
   // Get student's submissions for an assignment
   const getStudentSubmission = (assignmentId) => {
-    return submissions.find(s => s.assignmentId === assignmentId && s.studentId === student.id);
+    return submissions.find((s) => String(s.assignmentId) === String(assignmentId) && String(s.studentId) === String(student.id));
   };
 
   // Get student's attendance records
   const getStudentAttendance = () => {
-    return attendance.filter(a => a.studentId === student.id);
+    return attendance.filter((a) => String(a.studentId) === String(student.id));
   };
 
   // Get attendance percentage
@@ -202,7 +234,44 @@ const StudentPortal = () => {
     const studentAttendance = getStudentAttendance();
     const totalDays = studentAttendance.length;
     if (totalDays === 0) return 0;
-    return 100;
+
+    const attendedDays = studentAttendance.filter((record) => record.status === 'present' || record.status === 'late').length;
+    return Math.round((attendedDays / totalDays) * 100);
+  };
+
+  const getAttendanceBadgeStyle = (status) => {
+    if (status === 'late') return 'bg-yellow-100 text-yellow-700';
+    if (status === 'absent') return 'bg-red-100 text-red-700';
+    return 'bg-green-100 text-green-700';
+  };
+
+  const getTodayAttendanceRecord = () => {
+    const today = new Date().toDateString();
+    return studentAttendance.find((record) => record.date && new Date(record.date).toDateString() === today);
+  };
+
+  const handleMarkAttendance = async () => {
+    if (!selectedCourse?.courseId) return;
+
+    try {
+      setAttendanceSubmitting(true);
+      const response = await api.markAttendance({
+        course: selectedCourse.courseId,
+        status: 'present',
+      });
+
+      if (!response?.success) {
+        throw new Error(response?.message || 'Failed to mark attendance');
+      }
+
+      await loadCourseContent(selectedCourse);
+      alert('Attendance marked successfully');
+    } catch (error) {
+      console.error('Attendance mark error:', error);
+      alert(error?.message || 'Failed to mark attendance');
+    } finally {
+      setAttendanceSubmitting(false);
+    }
   };
 
   // Filter content by selected course
@@ -231,7 +300,10 @@ const StudentPortal = () => {
 
   // Handle document download
   const handleDownload = (doc) => {
-    alert(`Downloading: ${doc.fileName}`);
+    api.downloadFile(doc.fileUrl, doc.fileName || 'document')
+      .catch((error) => {
+        alert(error?.message || 'Failed to download file');
+      });
   };
 
   return (
@@ -432,6 +504,19 @@ const StudentPortal = () => {
                               <span className="text-xs text-gray-500">📅 Due: {assignment.dueDate}</span>
                               <span className="text-xs text-gray-500">⭐ Total Marks: {assignment.totalMarks}</span>
                             </div>
+                            {assignment.attachmentUrl && (
+                              <div className="mt-3">
+                                <button
+                                  onClick={() => {
+                                    api.downloadFile(assignment.attachmentUrl, assignment.attachmentName || 'assignment')
+                                      .catch((error) => alert(error?.message || 'Failed to download assignment file'));
+                                  }}
+                                  className="text-[#D4AF37] text-sm flex items-center gap-1 hover:underline"
+                                >
+                                  📎 Download Assignment File
+                                </button>
+                              </div>
+                            )}
                             {isSubmitted && (
                               <div className="mt-3 p-3 bg-green-50 rounded-lg">
                                 <p className="text-green-700 text-sm flex items-center gap-2">
@@ -474,6 +559,28 @@ const StudentPortal = () => {
                     <p className="text-sm opacity-90">✓ All sessions recorded automatically</p>
                   </div>
                 </div>
+
+                <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <h3 className="text-lg font-bold text-[#0B1F3A]">Mark Today's Attendance</h3>
+                      <p className="text-sm text-gray-500 mt-1">Tap once when you are present for the selected course.</p>
+                    </div>
+                    {getTodayAttendanceRecord() ? (
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-700">
+                        Attendance already marked today
+                      </span>
+                    ) : (
+                      <button
+                        onClick={handleMarkAttendance}
+                        disabled={attendanceSubmitting}
+                        className="px-4 py-2.5 bg-[#D4AF37] text-[#0B1F3A] rounded-xl font-semibold hover:bg-[#C49B2C] transition disabled:opacity-60"
+                      >
+                        {attendanceSubmitting ? 'Marking...' : 'Mark Attendance'}
+                      </button>
+                    )}
+                  </div>
+                </div>
                 
                 <div className="bg-white rounded-2xl shadow-lg p-6">
                   <h3 className="text-lg font-bold text-[#0B1F3A] mb-4">Attendance History</h3>
@@ -493,9 +600,9 @@ const StudentPortal = () => {
                         ) : (
                           studentAttendance.map(record => (
                             <tr key={record.id} className="border-b border-gray-100">
-                              <td className="p-3 text-sm">{record.date}</td>
+                              <td className="p-3 text-sm">{record.displayDate || (record.date ? new Date(record.date).toLocaleString() : '')}</td>
                               <td className="p-3 text-sm">
-                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Present</span>
+                                <span className={`px-2 py-1 rounded-full text-xs ${getAttendanceBadgeStyle(record.status)}`}>{record.status}</span>
                               </td>
                             </tr>
                           ))
@@ -504,7 +611,7 @@ const StudentPortal = () => {
                     </table>
                   </div>
                   <p className="text-xs text-gray-400 mt-4 text-center">
-                    * Attendance is automatically marked when you log into your dashboard
+                    * Attendance is recorded by your lecturer from the attendance panel
                   </p>
                 </div>
               </div>

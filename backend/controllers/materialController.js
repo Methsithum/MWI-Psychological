@@ -8,11 +8,16 @@ const getMaterials = asyncHandler(async (req, res) => {
 });
 
 const uploadMaterial = asyncHandler(async (req, res) => {
+  const fileUrl = req.file ? `/uploads/${req.file.filename}` : req.body.fileUrl;
+  const fallbackName = String(fileUrl || '').split('/').pop() || '';
+  const fileName = req.file ? req.file.originalname : (req.body.fileName || fallbackName);
+
   const material = await Material.create({
     course: req.body.course,
     uploader: req.user._id,
     title: req.body.title,
-    fileUrl: req.file ? req.file.path : req.body.fileUrl,
+    fileName,
+    fileUrl,
     fileType: req.file ? req.file.mimetype : req.body.fileType,
   });
 
