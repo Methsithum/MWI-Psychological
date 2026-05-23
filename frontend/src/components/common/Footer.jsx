@@ -60,7 +60,7 @@ const Footer = () => {
             {/* Social Icons with React Icons */}
             <div className="flex gap-3 mt-5 justify-center sm:justify-start">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/share/1CjeFTX9Cu/?mibextid=wwXIfr"
                 className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#1877f2] transition-all duration-300 hover:scale-110"
                 aria-label="Facebook"
                 target="_blank"
@@ -90,7 +90,7 @@ const Footer = () => {
               </a>
               
               <a
-                href="https://youtube.com"
+                href="https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX"
                 className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#ff0000] transition-all duration-300 hover:scale-110"
                 aria-label="YouTube"
                 target="_blank"
