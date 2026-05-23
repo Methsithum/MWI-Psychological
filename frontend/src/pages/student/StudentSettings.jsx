@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import auth from '../../utils/auth';
-import StudentTopbar from '../../components/student/StudentTopbar';
 
 const StudentSettings = () => {
   const navigate = useNavigate();
@@ -53,7 +52,6 @@ const StudentSettings = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F5EF]">
-      <StudentTopbar student={student} title="Student Settings" subtitle="Manage your account security" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="bg-white rounded-3xl shadow-xl border border-[#D4AF37]/20 overflow-hidden">
