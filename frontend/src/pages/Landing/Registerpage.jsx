@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaWhatsapp, FaCopy, FaCheck } from 'react-icons/fa';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 import api from '../../utils/api';
@@ -73,12 +74,10 @@ const Registerpage = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Program validation
     if (!selectedProgram) {
       newErrors.program = 'Please select a program';
     }
 
-    // Personal Information validation
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     } else if (formData.fullName.trim().length < 3) {
@@ -101,7 +100,6 @@ const Registerpage = () => {
       newErrors.address = 'Address is required';
     }
 
-    // Educational Information validation
     if (!formData.nic.trim()) {
       newErrors.nic = 'NIC number is required';
     } else if (formData.nic.trim().length < 5) {
@@ -112,7 +110,6 @@ const Registerpage = () => {
       newErrors.qualification = 'Please select your highest qualification';
     }
 
-    // Payment Information validation
     if (!formData.transactionId.trim()) {
       newErrors.transactionId = 'Transaction ID is required';
     }
@@ -136,14 +133,12 @@ const Registerpage = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
       if (!validTypes.includes(file.type)) {
         alert('Please upload a valid file (JPG, PNG, or PDF)');
         return;
       }
       
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         return;
@@ -165,7 +160,6 @@ const Registerpage = () => {
   const handleRemoveFile = () => {
     setPaymentSlip(null);
     setPaymentSlipPreview('');
-    // Reset the file input
     const fileInput = document.getElementById('paymentSlip');
     if (fileInput) fileInput.value = '';
   };
@@ -176,7 +170,6 @@ const Registerpage = () => {
       ...formData,
       [name]: value
     });
-    // Clear error for this field if it exists
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
@@ -221,6 +214,14 @@ const Registerpage = () => {
     }
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const whatsappMessage = `Hello, I would like to request bank details for the registration fee payment for ${selectedProgram === 'hrm' ? 'Diploma in HRM & Behavioral Psychology' : 'Diploma in Buddhist Counselling'}. My name is ${formData.fullName || '[Your Name]'}. Thank you!`;
+
   return (
     <div className="min-h-screen bg-[#FCFAF5]">
       <Navbar />
@@ -251,6 +252,9 @@ const Registerpage = () => {
           <p className="text-sm md:text-lg text-[#D1D8E0] max-w-2xl mx-auto">
             Choose your program and complete the registration to begin your journey
           </p>
+          <div className="mt-4 bg-[#D4AF37]/20 inline-block px-4 py-2 rounded-full">
+            <p className="text-xs text-[#D4AF37]">📌 Your NIC number will be your password for login</p>
+          </div>
         </div>
       </section>
 
@@ -441,6 +445,7 @@ const Registerpage = () => {
                       placeholder="Enter your NIC"
                     />
                     {errors.nic && <p className="text-red-500 text-xs mt-1">{errors.nic}</p>}
+                    <p className="text-xs text-gray-400 mt-1">⚠️ Your NIC number will be used as your password</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Highest Qualification *</label>
@@ -472,19 +477,32 @@ const Registerpage = () => {
                   Payment Information
                 </h3>
                 
-                <div className="bg-[#F8F4EC] rounded-xl p-4 md:p-5 mb-5">
-                  <h4 className="font-semibold text-[#0B1F3A] text-sm md:text-base mb-3">Bank Transfer Details</h4>
-                  <div className="space-y-2 text-sm">
-                    <p className="flex justify-between"><span className="text-gray-600">Bank Name:</span><span className="font-medium">Commercial Bank of Ceylon</span></p>
-                    <p className="flex justify-between"><span className="text-gray-600">Account Name:</span><span className="font-medium">PWI Psychological Institute</span></p>
-                    <p className="flex justify-between"><span className="text-gray-600">Account Number:</span><span className="font-medium">123-456-7890</span></p>
-                    <p className="flex justify-between"><span className="text-gray-600">Branch:</span><span className="font-medium">Colombo Main</span></p>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-[#D4AF37]/20">
-                    <p className="text-[#D4AF37] font-semibold text-sm">Registration Fee: Rs. 1,500</p>
-                    <p className="text-gray-500 text-xs mt-1">Pay the registration fee to confirm your seat</p>
+                {/* Request Bank Details Section - WhatsApp Integration */}
+                <div className="mb-5 p-4 bg-gradient-to-r from-[#25D366]/10 to-[#128C7E]/10 rounded-xl border border-[#25D366]/30">
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center">
+                        <FaWhatsapp className="text-white text-xl" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-[#0B1F3A] text-sm">Need Bank Details?</h4>
+                        <p className="text-xs text-gray-500">Request via WhatsApp to get payment information</p>
+                      </div>
+                    </div>
+                    <a
+                      href={`https://wa.me/94768856172?text=${encodeURIComponent(whatsappMessage)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-[#25D366] text-white rounded-full text-sm font-semibold hover:bg-[#128C7E] transition-all duration-300 flex items-center gap-2 hover:scale-105"
+                    >
+                      <FaWhatsapp size={16} />
+                      Request on WhatsApp
+                    </a>
                   </div>
                 </div>
+
+                {/* Bank Details Section (Visible after request or can be shown directly) */}
+                
 
                 <div className="grid md:grid-cols-2 gap-4 md:gap-5">
                   <div>

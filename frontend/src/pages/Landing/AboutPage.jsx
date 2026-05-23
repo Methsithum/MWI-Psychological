@@ -62,7 +62,7 @@ const AboutPage = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-5 leading-tight">
             About{' '}
             <span className="text-[#D4AF37] relative inline-block">
-              PWI Psychological
+              MWI Psychological
               <svg className="absolute bottom-0 left-0 w-full h-2 md:h-3 text-[#D4AF37]/40" viewBox="0 0 200 10" preserveAspectRatio="none">
                 <path d="M0 5 Q 50 10 100 5 T 200 5" stroke="currentColor" fill="none" strokeWidth="2"/>
               </svg>
@@ -87,7 +87,7 @@ const AboutPage = () => {
               <div className="w-12 h-0.5 bg-[#D4AF37] mb-4 md:mb-6"></div>
               
               <p className="text-sm md:text-base text-[#5A6A7A] leading-relaxed mb-3 md:mb-4">
-                PWI Psychological is a newly launched educational institute
+                MWI Psychological is a newly launched educational institute
                 dedicated to psychology, counselling, HRM, and behavioral development.
               </p>
 
@@ -167,7 +167,7 @@ const AboutPage = () => {
                 {/* Name Badge - Mobile */}
                 <div className="absolute bottom-4 left-4 right-4 lg:hidden">
                   <div className="bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-lg border border-[#D4AF37]/20">
-                    <h3 className="text-lg font-bold text-[#0B1F3A]">K.M. Imasha Isurunee</h3>
+                    <h3 className="text-lg font-bold text-[#0B1F3A]">K.M. Imasha Isurune</h3>
                     <p className="text-[#D4AF37] text-xs mt-0.5">Psychologist | Lecturer | Counsellor</p>
                     <p className="text-gray-500 text-xs mt-0.5">ඉසුරුණී මුදලිගේ</p>
                   </div>
@@ -178,14 +178,14 @@ const AboutPage = () => {
               <div className="lg:w-3/5 p-5 md:p-6 lg:p-8">
                 {/* Name - Desktop only */}
                 <div className="hidden lg:block mb-5">
-                  <h3 className="text-2xl font-bold text-[#0B1F3A]">K.M. Imasha Isurunee</h3>
+                  <h3 className="text-2xl font-bold text-[#0B1F3A]">K.M. Imasha Isurune</h3>
                   <p className="text-[#D4AF37] text-sm mt-1">Psychologist | Lecturer | Counsellor | Ayurvedic Therapist</p>
                   <p className="text-gray-500 text-sm mt-1">ඉසුරුණී මුදලිගේ</p>
                   <div className="w-12 h-0.5 bg-[#D4AF37] mt-3"></div>
                 </div>
 
                 <p className="text-sm md:text-base text-[#5A6A7A] leading-relaxed mb-5 md:mb-6">
-                  K.M. Imasha Isurunee is a psychology lecturer, counsellor, and
+                  K.M. Imasha Isurune is a psychology lecturer, counsellor, and
                   behavioural psychology educator specializing in emotional wellbeing,
                   counselling, mindfulness, and human behaviour studies.
                 </p>
@@ -253,7 +253,7 @@ const AboutPage = () => {
           <div className="text-center mb-10 md:mb-16">
             <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">Why Choose Us</span>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#0B1F3A] mt-2 md:mt-3">
-              Reasons to Trust PWI
+              Reasons to Trust MWI
             </h2>
             <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-3 md:mt-4"></div>
             <p className="text-sm md:text-base text-[#5A6A7A] max-w-2xl mx-auto mt-3 md:mt-4 px-4">
