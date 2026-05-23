@@ -6,6 +6,11 @@ const loginValidator = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
+const loginBodyValidator = [
+  body('email').isEmail().withMessage('A valid email is required'),
+  body('password').notEmpty().withMessage('Password is required'),
+];
+
 const studentRegisterValidator = [
   body('fullName').notEmpty().withMessage('Full name is required'),
   body('email').isEmail().withMessage('A valid email is required'),
@@ -27,4 +32,9 @@ const changePasswordValidator = [
   body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
 ];
 
-module.exports = { loginValidator, studentRegisterValidator, changePasswordValidator };
+module.exports = {
+  loginValidator,
+  loginBodyValidator,
+  studentRegisterValidator,
+  changePasswordValidator,
+};

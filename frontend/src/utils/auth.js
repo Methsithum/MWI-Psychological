@@ -42,4 +42,36 @@ export function logout() {
   removeUser();
 }
 
-export default { getToken, setToken, removeToken, getUser, setUser, removeUser, logout };
+export function isAuthenticated() {
+  return Boolean(getToken() && getUser());
+}
+
+export function getRole() {
+  return getUser()?.role || null;
+}
+
+export function getDashboardPath(role) {
+  switch (role) {
+    case 'admin':
+      return '/admin';
+    case 'teacher':
+      return '/teacher';
+    case 'student':
+      return '/student';
+    default:
+      return '/signin';
+  }
+}
+
+export default {
+  getToken,
+  setToken,
+  removeToken,
+  getUser,
+  setUser,
+  removeUser,
+  logout,
+  isAuthenticated,
+  getRole,
+  getDashboardPath,
+};
