@@ -2,11 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
+
+const resolveMediaUrl = (url) => {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedUser, setSelectedUser] = useState(null);
   const [showSlipModal, setShowSlipModal] = useState(false);
+  const [slipPreviewUrl, setSlipPreviewUrl] = useState('');
+  const [slipPreviewError, setSlipPreviewError] = useState('');
+  const [slipPreviewLoading, setSlipPreviewLoading] = useState(false);
   const [registrationRequests, setRegistrationRequests] = useState([]);
   const [approvedStudents, setApprovedStudents] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -40,6 +51,7 @@ const AdminDashboard = () => {
     courseId: registration.course?._id || registration.course,
     transactionId: registration.paymentInformation?.transactionId || '',
     paymentSlip: registration.paymentInformation?.paymentSlipUrl || '',
+    paymentSlipMimeType: registration.paymentInformation?.paymentSlipMimeType || '',
     nic: registration.nic,
     whatsappNumber: registration.whatsappNumber,
     address: registration.address,
@@ -96,6 +108,57 @@ const AdminDashboard = () => {
       setSystemActivities(activities);
     }
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrl = '';
+
+    const loadSlipPreview = async () => {
+      if (!showSlipModal || !selectedUser?.paymentSlip) {
+        setSlipPreviewUrl('');
+        setSlipPreviewError('');
+        setSlipPreviewLoading(false);
+        return;
+      }
+
+      setSlipPreviewLoading(true);
+      setSlipPreviewError('');
+      setSlipPreviewUrl('');
+
+      try {
+        const slipUrl = resolveMediaUrl(selectedUser.paymentSlip);
+        const response = await fetch(slipUrl);
+
+        if (!response.ok) {
+          throw new Error(`Failed to load slip (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        objectUrl = URL.createObjectURL(blob);
+
+        if (active) {
+          setSlipPreviewUrl(objectUrl);
+        }
+      } catch (error) {
+        if (active) {
+          setSlipPreviewError(error?.message || 'Failed to load payment slip');
+        }
+      } finally {
+        if (active) {
+          setSlipPreviewLoading(false);
+        }
+      }
+    };
+
+    loadSlipPreview();
+
+    return () => {
+      active = false;
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [showSlipModal, selectedUser]);
 
   const addActivity = (action, type) => {
     const newActivity = {
@@ -606,8 +669,16 @@ const AdminDashboard = () => {
               <p className="text-sm"><strong>Student:</strong> {selectedUser.fullName}</p>
               <p className="text-sm"><strong>Transaction ID:</strong> {selectedUser.transactionId}</p>
               <p className="text-sm"><strong>Amount:</strong> Rs. 1,500</p>
-              {selectedUser.paymentSlip ? (
-                <img src={selectedUser.paymentSlip} alt="Payment Slip" className="w-full rounded-lg border mt-3" />
+              {slipPreviewLoading ? (
+                <p className="text-sm text-gray-500 mt-3">Loading slip...</p>
+              ) : slipPreviewError ? (
+                <p className="text-sm text-red-500 mt-3">{slipPreviewError}</p>
+              ) : slipPreviewUrl ? (
+                <img
+                  src={slipPreviewUrl}
+                  alt="Payment Slip"
+                  className="w-full rounded-lg border mt-3"
+                />
               ) : (
                 <p className="text-red-500 text-sm">No slip uploaded</p>
               )}
