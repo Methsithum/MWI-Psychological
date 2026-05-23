@@ -799,7 +799,6 @@ const TeacherDashboard = () => {
                         <tr>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Student Name</th>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Email</th>
-                          <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Program</th>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Done</th>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Avg Score</th>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm">Progress</th>
@@ -812,7 +811,6 @@ const TeacherDashboard = () => {
                             <tr key={student.id} className="border-b border-gray-100 hover:bg-[#F8F4EC]/50">
                               <td className="p-2 sm:p-3 text-xs sm:text-sm font-medium">{student.fullName}</td>
                               <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.email}</td>
-                              <td className="p-2 sm:p-3 text-xs sm:text-sm">{student.program === 'hrm' ? 'HRM' : 'Buddhist'}</td>
                               <td className="p-2 sm:p-3 text-xs sm:text-sm">{progress.submittedCount}/{progress.totalAssignments}</td>
                               <td className="p-2 sm:p-3 text-xs sm:text-sm">{progress.averageScore}%</td>
                               <td className="p-2 sm:p-3 text-xs sm:text-sm">
@@ -828,7 +826,7 @@ const TeacherDashboard = () => {
                         })}
                         {students.length === 0 && (
                           <tr>
-                            <td colSpan="6" className="text-center p-6 sm:p-8 text-gray-500 text-sm">No students enrolled yet</td>
+                            <td colSpan="5" className="text-center p-6 sm:p-8 text-gray-500 text-sm">No students enrolled yet</td>
                           </tr>
                         )}
                       </tbody>

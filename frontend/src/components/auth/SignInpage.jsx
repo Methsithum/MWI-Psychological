@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
 import api from '../../utils/api';
+import auth from '../../utils/auth';
 
 const SignInpage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('student');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -51,24 +51,12 @@ const SignInpage = () => {
       setIsSubmitting(true);
       
       try {
-        const res = await api.login(selectedRole, formData.email, formData.password);
+        const res = await api.login(formData.email, formData.password);
         if (res && res.token) {
-          const storage = formData.rememberMe ? localStorage : sessionStorage;
-          storage.setItem('token', res.token);
-          storage.setItem('user', JSON.stringify(res.user));
+          auth.setToken(res.token, formData.rememberMe);
+          auth.setUser(res.user, formData.rememberMe);
           alert(`Welcome back ${res.user.fullName || res.user.email}!`);
-          
-          // Route to correct dashboard based on role
-          let dashboardPath = '/';
-          if (res.user.role === 'admin') {
-            dashboardPath = '/admin';
-          } else if (res.user.role === 'teacher') {
-            dashboardPath = '/teacher';
-          } else if (res.user.role === 'student') {
-            dashboardPath = '/student';
-          }
-          
-          navigate(dashboardPath);
+          navigate(auth.getDashboardPath(res.user.role));
         } else {
           alert(res.message || 'Invalid email or password. If you registered, wait for approval.');
         }
@@ -126,29 +114,6 @@ const SignInpage = () => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-5 md:p-6 space-y-4">
-                  {/* Role Selector */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#0B1F3A] mb-2">
-                      Login As
-                    </label>
-                    <div className="flex gap-2">
-                      {['student', 'teacher', 'admin'].map((role) => (
-                        <button
-                          key={role}
-                          type="button"
-                          onClick={() => setSelectedRole(role)}
-                          className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm transition ${
-                            selectedRole === role
-                              ? 'bg-[#D4AF37] text-[#0B1F3A]'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                          }`}
-                        >
-                          {role.charAt(0).toUpperCase() + role.slice(1)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1.5">
                       Email Address

@@ -293,8 +293,8 @@ export default {
     return res.json();
   },
 
-  async login(role, email, password) {
-    return request(`/api/auth/login/${encodeURIComponent(role)}`, {
+  async login(email, password) {
+    return request('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })

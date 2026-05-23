@@ -9,20 +9,17 @@ const { extractUploadedAsset } = require('../utils/cloudinaryAsset');
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const role = req.params.role || req.body.role;
-  const allowedRoles = ['admin', 'teacher', 'student'];
+  const requestedRole = req.params.role;
 
-  if (!allowedRoles.includes(role)) {
-    throw new ApiError(400, 'Invalid role');
-  }
-
-  const user = await User.findOne({ email }).select('+password').populate('course', 'title code');
+  const user = await User.findOne({ email: email.toLowerCase().trim() })
+    .select('+password')
+    .populate('course', 'title code');
 
   if (!user) {
     throw new ApiError(401, 'Invalid credentials');
   }
 
-  if (role && user.role !== role) {
+  if (requestedRole && user.role !== requestedRole) {
     throw new ApiError(403, 'Role mismatch');
   }
 
