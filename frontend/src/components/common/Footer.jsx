@@ -81,7 +81,7 @@ const Footer = () => {
 
               <a
                 href="https://www.tiktok.com/@.psychological.in?_r=1&_t=ZS-96Zxb5kJrz6"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#da148e] transition-all duration-300 hover:scale-110"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#da148e]transition-all duration-300 hover:scale-110"
                 aria-label="Tiktok "
                 target="_blank"
                 rel="noopener noreferrer"
@@ -109,7 +109,7 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
-            </ul>
+            </ul> 
           </div>
 
           {/* Program Section */}

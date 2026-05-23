@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaTiktok, FaYoutube, FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 
@@ -83,27 +83,21 @@ const ContactPage = () => {
     { 
       icon: <FaFacebookF />, 
       name: "Facebook", 
-      url: "https://facebook.com", 
+      url: "https://www.facebook.com/share/1CjeFTX9Cu/?mibextid=wwXIfr", 
       color: "hover:bg-[#1877f2]" 
-    },
-    { 
-      icon: <FaInstagram />, 
-      name: "Instagram", 
-      url: "https://instagram.com", 
-      color: "hover:bg-[#e4405f]" 
-    },
-    { 
-      icon: <FaLinkedinIn />, 
-      name: "LinkedIn", 
-      url: "https://linkedin.com", 
-      color: "hover:bg-[#0a66c2]" 
-    },
-    { 
+    },  { 
       icon: <FaYoutube />, 
       name: "YouTube", 
-      url: "https://youtube.com", 
+      url: "https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX", 
       color: "hover:bg-[#ff0000]" 
     },
+     { 
+      icon: <FaTiktok />, 
+      name: "TikTok", 
+      url: "https://www.tiktok.com/@mindfulwithisuruni", 
+      color: "hover:bg-[#da148e]" 
+    }, 
+   
     { 
       icon: <FaWhatsapp />, 
       name: "WhatsApp", 

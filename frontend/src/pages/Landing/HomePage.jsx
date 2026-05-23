@@ -320,9 +320,9 @@ const HomePage = () => {
           </p>
           <div className="mt-8">
             <div className="w-12 h-12 bg-[#D4AF37] rounded-full mx-auto flex items-center justify-center text-[#0B1F3A] font-bold text-xl">
-              S
+              R
             </div>
-            <p className="text-[#D4AF37] font-medium mt-3">Sarah Johnson</p>
+            <p className="text-[#D4AF37] font-medium mt-3">Rashmi Nimsarani</p>
             <p className="text-white/60 text-sm">Current Student</p>
           </div>
         </div>
