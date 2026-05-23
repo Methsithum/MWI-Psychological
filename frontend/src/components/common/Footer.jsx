@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTwitter, FaEnvelope, FaPhoneAlt, FaWhatsapp, FaClock } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTwitter, FaEnvelope, FaPhoneAlt, FaWhatsapp, FaClock, FaTiktok } from 'react-icons/fa';
 import logo from '../../assets/logo.png';
 
 const Footer = () => {
@@ -70,26 +70,6 @@ const Footer = () => {
               </a>
               
               <a
-                href="https://instagram.com"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#e4405f] transition-all duration-300 hover:scale-110"
-                aria-label="Instagram"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaInstagram size={14} />
-              </a>
-              
-              <a
-                href="https://linkedin.com"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#0a66c2] transition-all duration-300 hover:scale-110"
-                aria-label="LinkedIn"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaLinkedinIn size={14} />
-              </a>
-              
-              <a
                 href="https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX"
                 className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#ff0000] transition-all duration-300 hover:scale-110"
                 aria-label="YouTube"
@@ -100,13 +80,13 @@ const Footer = () => {
               </a>
 
               <a
-                href="https://twitter.com"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#1DA1F2] transition-all duration-300 hover:scale-110"
-                aria-label="Twitter"
+                href="https://www.tiktok.com/@.psychological.in?_r=1&_t=ZS-96Zxb5kJrz6"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#da148e] transition-all duration-300 hover:scale-110"
+                aria-label="Tiktok "
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FaTwitter size={14} />
+                <FaTiktok size={14} />
               </a>
             </div>
           </div>
