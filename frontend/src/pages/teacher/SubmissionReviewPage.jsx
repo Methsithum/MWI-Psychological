@@ -140,7 +140,7 @@ const SubmissionReviewPage = () => {
                     <td className="p-3 align-top">
                       {submission.fileUrl ? (
                         <button
-                          onClick={() => api.downloadFile(submission.fileUrl, submission.fileName || 'submission').catch((error) => alert(error?.message || 'Failed to download submission'))}
+                          onClick={() => api.downloadFile(submission.fileUrl, submission.fileName || 'submission', { type: 'submission', id: submission.id }).catch((error) => alert(error?.message || 'Failed to download submission'))}
                           className="text-xs text-[#D4AF37] font-semibold hover:underline"
                         >
                           Download {submission.fileName || 'file'}

@@ -683,7 +683,7 @@ const TeacherDashboard = () => {
                             <p className="text-[10px] sm:text-xs text-gray-400">{doc.date}</p>
                           </div>
                           <div className="flex items-center gap-2 w-full sm:w-auto">
-                            <button onClick={() => { api.downloadFile(doc.fileUrl, doc.fileName || 'document').catch((error) => { alert(error?.message || 'Failed to download file'); }); }} className="flex-1 sm:flex-none px-2 py-1 sm:px-3 sm:py-1.5 bg-[#D4AF37] text-[#0B1F3A] rounded-lg text-xs font-semibold">Download</button>
+                            <button onClick={() => { api.downloadFile(doc.fileUrl, doc.fileName || 'document', { type: 'material', id: doc.id }).catch((error) => { alert(error?.message || 'Failed to download file'); }); }} className="flex-1 sm:flex-none px-2 py-1 sm:px-3 sm:py-1.5 bg-[#D4AF37] text-[#0B1F3A] rounded-lg text-xs font-semibold">Download</button>
                             <button onClick={() => handleDeleteDocument(doc.id)} className="flex-1 sm:flex-none px-2 py-1 sm:px-3 sm:py-1.5 bg-red-500 text-white rounded-lg text-xs font-semibold hover:bg-red-600 transition">Delete</button>
                           </div>
                         </div>
@@ -775,7 +775,7 @@ const TeacherDashboard = () => {
                             </div>
                             <p className="text-gray-600 text-xs sm:text-sm mb-3">{assignment.description}</p>
                             {assignment.attachmentUrl && (
-                              <div className="mb-3"><button onClick={() => { api.downloadFile(assignment.attachmentUrl, assignment.attachmentName || 'assignment').catch((error) => { alert(error?.message || 'Failed to download assignment file'); }); }} className="text-[#D4AF37] text-xs sm:text-sm flex items-center gap-1 hover:underline">📎 Download Assignment File</button></div>
+                              <div className="mb-3"><button onClick={() => { api.downloadFile(assignment.attachmentUrl, assignment.attachmentName || 'assignment', { type: 'assignment', id: assignment.id }).catch((error) => { alert(error?.message || 'Failed to download assignment file'); }); }} className="text-[#D4AF37] text-xs sm:text-sm flex items-center gap-1 hover:underline">📎 Download Assignment File</button></div>
                             )}
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                               <div className="flex gap-3"><span className="text-[10px] sm:text-xs text-gray-500">📝 Total Marks: {assignment.totalMarks}</span><span className="text-[10px] sm:text-xs text-gray-500">📤 Submissions: {submissionsCount}</span></div>

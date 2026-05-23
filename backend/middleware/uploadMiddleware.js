@@ -1,53 +1,72 @@
 const multer = require('multer');
-const path = require('path');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
 const ApiError = require('../utils/ApiError');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(process.cwd(), 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
-  },
+const DOCUMENT_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+
+const PAYMENT_SLIP_MIME_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+
+const documentStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async () => ({
+    folder: 'lms/documents',
+    resource_type: 'auto',
+    access_mode: 'public',
+    type: 'upload',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx'],
+    use_filename: true,
+    unique_filename: true,
+    overwrite: false,
+  }),
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = [
-    'image/jpeg',
-    'image/png',
-    'application/pdf',
-    'video/mp4',
-    'video/quicktime',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  ];
+const paymentSlipStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async () => ({
+    folder: 'lms/payment-slips',
+    resource_type: 'auto',
+    access_mode: 'public',
+    type: 'upload',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+    use_filename: true,
+    unique_filename: true,
+    overwrite: false,
+  }),
+});
 
-  if (allowedMimeTypes.includes(file.mimetype)) {
+const documentFileFilter = (req, file, cb) => {
+  if (DOCUMENT_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
-  } else {
-    cb(new ApiError(400, 'Unsupported file type'), false);
+    return;
   }
+
+  cb(new ApiError(400, 'Unsupported file type. Allowed: PDF, DOC, DOCX, JPG, PNG'), false);
+};
+
+const paymentSlipFileFilter = (req, file, cb) => {
+  if (PAYMENT_SLIP_MIME_TYPES.includes(file.mimetype)) {
+    cb(null, true);
+    return;
+  }
+
+  cb(new ApiError(400, 'Payment slip must be JPEG, PNG, or PDF'), false);
 };
 
 const upload = multer({
-  storage,
-  fileFilter,
+  storage: documentStorage,
+  fileFilter: documentFileFilter,
   limits: { fileSize: 1024 * 1024 * 500 },
 });
 
-const paymentSlipFileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-
-  if (allowedMimeTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new ApiError(400, 'Payment slip must be JPEG, PNG, or PDF'), false);
-  }
-};
-
 const paymentSlipUpload = multer({
-  storage,
+  storage: paymentSlipStorage,
   fileFilter: paymentSlipFileFilter,
   limits: { fileSize: 1024 * 1024 * 10 },
 });

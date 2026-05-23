@@ -23,6 +23,19 @@ const paymentInformationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    paymentSlipPublicId: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    paymentSlipMetadata: {
+      originalName: { type: String, default: '' },
+      mimeType: { type: String, default: '' },
+      size: { type: Number, default: 0 },
+      format: { type: String, default: '' },
+      resourceType: { type: String, default: '' },
+      bytes: { type: Number, default: 0 },
+    },
     paymentSlipMimeType: {
       type: String,
       required: true,

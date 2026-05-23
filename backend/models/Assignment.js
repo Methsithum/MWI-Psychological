@@ -9,6 +9,15 @@ const assignmentSchema = new mongoose.Schema(
     dueDate: { type: Date, required: true },
     totalMarks: { type: Number, default: 0 },
     attachmentUrl: { type: String, default: '' },
+    attachmentPublicId: { type: String, default: '' },
+    attachmentMetadata: {
+      originalName: { type: String, default: '' },
+      mimeType: { type: String, default: '' },
+      size: { type: Number, default: 0 },
+      format: { type: String, default: '' },
+      resourceType: { type: String, default: '' },
+      bytes: { type: Number, default: 0 },
+    },
     attachmentName: { type: String, default: '' },
   },
   { timestamps: true }

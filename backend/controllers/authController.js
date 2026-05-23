@@ -5,6 +5,7 @@ const Course = require('../models/Course');
 const StudentRegistration = require('../models/StudentRegistration');
 const PaymentInformation = require('../models/PaymentInformation');
 const generateToken = require('../utils/token');
+const { extractUploadedAsset } = require('../utils/cloudinaryAsset');
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -115,13 +116,17 @@ const registerStudent = asyncHandler(async (req, res) => {
     status: 'pending',
   });
 
+  const uploadedSlip = extractUploadedAsset(req.file);
+
   const paymentInformation = await PaymentInformation.create({
     registration: registration._id,
     paymentMethod,
     transactionId,
-    paymentSlipUrl: `/uploads/${req.file.filename}`,
-    paymentSlipMimeType: req.file.mimetype,
-    paymentSlipOriginalName: req.file.originalname,
+    paymentSlipUrl: uploadedSlip.fileUrl,
+    paymentSlipPublicId: uploadedSlip.publicId,
+    paymentSlipMetadata: uploadedSlip.metadata,
+    paymentSlipMimeType: uploadedSlip.metadata.mimeType,
+    paymentSlipOriginalName: uploadedSlip.metadata.originalName,
   });
 
   registration.paymentInformation = paymentInformation._id;

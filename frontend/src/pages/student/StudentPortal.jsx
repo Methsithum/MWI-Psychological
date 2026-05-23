@@ -300,7 +300,7 @@ const StudentPortal = () => {
 
   // Handle document download
   const handleDownload = (doc) => {
-    api.downloadFile(doc.fileUrl, doc.fileName || 'document')
+    api.downloadFile(doc.fileUrl, doc.fileName || 'document', { type: 'material', id: doc.id })
       .catch((error) => {
         alert(error?.message || 'Failed to download file');
       });
@@ -508,7 +508,7 @@ const StudentPortal = () => {
                               <div className="mt-3">
                                 <button
                                   onClick={() => {
-                                    api.downloadFile(assignment.attachmentUrl, assignment.attachmentName || 'assignment')
+                                    api.downloadFile(assignment.attachmentUrl, assignment.attachmentName || 'assignment', { type: 'assignment', id: assignment.id })
                                       .catch((error) => alert(error?.message || 'Failed to download assignment file'));
                                   }}
                                   className="text-[#D4AF37] text-sm flex items-center gap-1 hover:underline"

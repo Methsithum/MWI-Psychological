@@ -2,6 +2,11 @@ const BASE = import.meta.env.VITE_API_BASE || '';
 import auth from './auth';
 
 const ABSOLUTE_URL = /^https?:\/\//i;
+const CLOUDINARY_HOST = 'res.cloudinary.com';
+
+function isCloudinaryUrl(url) {
+  return Boolean(url && String(url).includes(CLOUDINARY_HOST));
+}
 
 function resolveFileUrl(path) {
   if (!path) return '';
@@ -19,7 +24,40 @@ function resolveFileUrl(path) {
   return `${BASE}/${normalized}`;
 }
 
-async function downloadFile(path, fileName = 'download') {
+async function downloadFile(path, fileName = 'download', resource = null) {
+  const token = auth.getToken();
+
+  if (resource?.type && resource?.id) {
+    const response = await fetch(
+      `${BASE}/api/files/${encodeURIComponent(resource.type)}/${encodeURIComponent(resource.id)}/download`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+
+    if (!response.ok) {
+      let message = `Failed to download file (${response.status})`;
+      try {
+        const body = await response.json();
+        if (body?.message) message = body.message;
+      } catch {
+        // ignore parse errors
+      }
+      throw new Error(message);
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = fileName || 'download';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+    return;
+  }
+
   const resolvedUrl = resolveFileUrl(path);
   if (!resolvedUrl) {
     throw new Error('File URL is not available');
@@ -59,6 +97,7 @@ async function request(path, options = {}) {
 export default {
   request,
   resolveFileUrl,
+  isCloudinaryUrl,
   downloadFile,
 
   async getCourses() {

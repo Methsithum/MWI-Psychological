@@ -8,16 +8,22 @@ const getVideos = asyncHandler(async (req, res) => {
 });
 
 const uploadVideo = asyncHandler(async (req, res) => {
+  const videoUrl = (req.body.videoUrl || '').trim();
+
+  if (!videoUrl) {
+    throw new ApiError(400, 'Video URL is required (YouTube, Vimeo, Zoom, etc.)');
+  }
+
   const video = await Video.create({
     course: req.body.course,
     uploader: req.user._id,
     title: req.body.title,
     description: req.body.description || '',
-    videoUrl: req.file ? req.file.path : req.body.videoUrl,
+    videoUrl,
     duration: req.body.duration || 0,
   });
 
-  res.status(201).json({ success: true, message: 'Video uploaded', data: video });
+  res.status(201).json({ success: true, message: 'Video added', data: video });
 });
 
 const deleteVideo = asyncHandler(async (req, res) => {
