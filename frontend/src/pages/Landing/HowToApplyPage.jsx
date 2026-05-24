@@ -8,8 +8,8 @@ const HowToApplyPage = () => {
   const steps = [
     {
       number: "01",
-      title: "Create Your Account",
-      description: "Sign up on our LMS portal with your basic information",
+      title: "Register Your Account",
+      description: "Register on our LMS portal with your basic information",
       icon: "📝"
     },
     {
@@ -21,7 +21,7 @@ const HowToApplyPage = () => {
     {
       number: "03",
       title: "Upload Documents",
-      description: "Submit certificates, ID proof, and required documents",
+      description: "Submit required documents",
       icon: "📎"
     },
     {
@@ -196,56 +196,7 @@ const HowToApplyPage = () => {
       </section>
 
       {/* Fee Structure - Modern Card Design */}
-      <section className="py-16 md:py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 md:mb-12">
-            <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">Investment</span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#0B1F3A] mt-2 md:mt-3">
-              Fee Structure
-            </h2>
-            <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-3 md:mt-4"></div>
-            <p className="text-sm md:text-base text-[#5A6A7A] mt-3 md:mt-4">
-              Affordable payment options for the Diploma in Psychology Program
-            </p>
-          </div>
-
-          <div className="bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-[#D4AF37]/20">
-            <div className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] text-white p-4 md:p-5">
-              <div className="flex items-center gap-2">
-                <span className="text-xl md:text-2xl">🎓</span>
-                <span className="font-semibold text-sm md:text-base">Diploma in Psychology Program</span>
-              </div>
-            </div>
-
-            <div className="divide-y divide-[#D4AF37]/10">
-              {fees.map((fee, i) => (
-                <div key={i} className="flex justify-between items-center p-4 md:p-5 hover:bg-[#F8F4EC] transition">
-                  <span className="text-sm md:text-base text-[#5A6A7A]">{fee.item}</span>
-                  <span className="text-[#D4AF37] font-bold text-sm md:text-base">{fee.amount}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#F5E6A8]/20 p-4 md:p-5 border-t border-[#D4AF37]/20">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-[#0B1F3A] text-sm md:text-base">Total Program Fee</span>
-                <span className="text-[#D4AF37] font-bold text-base md:text-lg">Rs. 54,000</span>
-              </div>
-              <p className="text-xs text-[#6B7A8A] mt-2">
-                * EMI options available. Contact for more details.
-              </p>
-            </div>
-          </div>
-
-          {/* Payment Note */}
-          <div className="mt-6 md:mt-8 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-[#D4AF37]/10 rounded-full">
-              <span className="text-[#D4AF37] text-sm md:text-base">💳</span>
-              <span className="text-xs md:text-sm text-[#5A6A7A]">Secure online payment • Bank transfer available</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Important Dates */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-white to-[#F8F4EC]">
@@ -257,7 +208,7 @@ const HowToApplyPage = () => {
                 <span className="text-2xl md:text-3xl">📅</span>
               </div>
               <h3 className="text-base md:text-lg font-bold text-[#0B1F3A] mb-1">Application Deadline</h3>
-              <p className="text-[#D4AF37] font-semibold text-sm md:text-base">December 15, 2024</p>
+              <p className="text-[#D4AF37] font-semibold text-sm md:text-base">Contact for details</p>
             </div>
 
             <div className="text-center bg-white rounded-xl md:rounded-2xl p-5 md:p-6 shadow-lg border border-[#D4AF37]/10">
@@ -265,7 +216,7 @@ const HowToApplyPage = () => {
                 <span className="text-2xl md:text-3xl">🎓</span>
               </div>
               <h3 className="text-base md:text-lg font-bold text-[#0B1F3A] mb-1">Batch Starts</h3>
-              <p className="text-[#D4AF37] font-semibold text-sm md:text-base">January 15, 2025</p>
+              <p className="text-[#D4AF37] font-semibold text-sm md:text-base">Contact for details</p>
             </div>
 
             <div className="text-center bg-white rounded-xl md:rounded-2xl p-5 md:p-6 shadow-lg border border-[#D4AF37]/10">
