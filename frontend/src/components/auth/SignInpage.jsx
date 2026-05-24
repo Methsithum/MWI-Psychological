@@ -140,7 +140,7 @@ const SignInpage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-[#0B1F3A] mb-1.5">
-                      Password <span className="text-xs text-[#D4AF37]">(NIC Number)</span>
+                      Password
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
