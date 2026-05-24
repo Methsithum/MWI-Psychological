@@ -513,7 +513,10 @@ const TeacherDashboard = () => {
                 <span className="text-xs sm:text-sm hidden md:block">{currentUser?.fullName || 'Lecturer'}</span>
               </div>
               <button 
-                onClick={() => navigate('/')}
+                onClick={() => {
+                  auth.logout();
+                  navigate('/');
+                }}
                 className="flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-xs sm:text-sm transition-all duration-300"
               >
                 <FaSignOutAlt size={12} />

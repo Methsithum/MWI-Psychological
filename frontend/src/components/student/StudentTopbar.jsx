@@ -16,7 +16,7 @@ const StudentTopbar = ({ student, title = 'Student Portal', subtitle = 'PWI Psyc
 
   const handleLogout = () => {
     auth.logout();
-    navigate('/signin');
+    navigate('/');
   };
 
   const displayName = student?.fullName || 'Student';

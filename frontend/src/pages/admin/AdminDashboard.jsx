@@ -391,6 +391,7 @@ const AdminDashboard = () => {
               <button 
                 onClick={() => {
                   addActivity('Admin logged out', 'system');
+                  auth.logout();
                   navigate('/');
                 }}
                 className="flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 bg-red-500/20 hover:bg-red-500/30 rounded-lg text-xs sm:text-sm transition-all duration-300"
