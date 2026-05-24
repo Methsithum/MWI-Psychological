@@ -1,19 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import auth from '../../utils/auth';
+import api from '../../utils/api';
 
 const StudentProfile = () => {
-  const student = auth.getUser();
+  const cached = auth.getUser();
+  const [profile, setProfile] = useState({
+    fullName: cached?.fullName || 'Student',
+    email: cached?.email || '',
+    role: cached?.role || 'student',
+    status: cached?.status || 'approved',
+    nic: cached?.nic || 'Not available',
+    courseTitle: cached?.course?.title || cached?.course?.name || 'Not assigned yet',
+    courseCode: cached?.course?.code || '-',
+    forcePasswordChange: cached?.forcePasswordChange ? 'Yes' : 'No',
+  });
 
-  const profile = {
-    fullName: student?.fullName || 'Student',
-    email: student?.email || '',
-    role: student?.role || 'student',
-    status: student?.status || 'approved',
-    nic: student?.nic || 'Not available',
-    courseTitle: student?.course?.title || student?.course?.name || 'Not assigned yet',
-    courseCode: student?.course?.code || '-',
-    forcePasswordChange: student?.forcePasswordChange ? 'Yes' : 'No',
-  };
+  useEffect(() => {
+    let active = true;
+    api.getCurrentUser()
+      .then((res) => {
+        if (!active) return;
+        const u = res?.data || {};
+        setProfile({
+          fullName: u.fullName || cached?.fullName || 'Student',
+          email: u.email || cached?.email || '',
+          role: u.role || cached?.role || 'student',
+          status: u.status || cached?.status || 'approved',
+          nic: u.nic || cached?.nic || 'Not available',
+          courseTitle: u.course?.title || cached?.course?.title || 'Not assigned yet',
+          courseCode: u.course?.code || cached?.course?.code || '-',
+          forcePasswordChange: u.forcePasswordChange ? 'Yes' : (cached?.forcePasswordChange ? 'Yes' : 'No'),
+        });
+      })
+      .catch(() => {
+        // keep cached profile if API fails
+      });
+
+    return () => { active = false; };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8F5EF]">
