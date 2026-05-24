@@ -250,6 +250,27 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteStudent = async (studentId, studentName) => {
+    const confirmed = window.confirm(`Delete ${studentName}? This will remove the student account.`);
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const res = await api.deleteStudent(studentId);
+      if (!res || !res.success) {
+        throw new Error(res?.message || 'Delete failed');
+      }
+
+      toast.success('Student deleted successfully');
+      addActivity(`Deleted student account: ${studentName}`, 'rejection');
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Delete student error:', error);
+      toast.error(error?.message || 'Failed to delete student');
+    }
+  };
+
   const handleViewSlip = (student) => {
     setSelectedUser(student);
     setShowSlipModal(true);
@@ -636,6 +657,7 @@ const AdminDashboard = () => {
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-semibold text-gray-600">Student</th>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-semibold text-gray-600 hidden sm:table-cell">Email</th>
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-semibold text-gray-600">Program</th>
+                          <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-semibold text-gray-600">Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -657,6 +679,14 @@ const AdminDashboard = () => {
                             </td>
                             <td className="p-2 sm:p-3">
                               <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] sm:text-xs">{student.programme}</span>
+                            </td>
+                            <td className="p-2 sm:p-3">
+                              <button
+                                onClick={() => handleDeleteStudent(student.id, student.fullName)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] sm:text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 transition"
+                              >
+                                <FaTrash size={10} /> Delete
+                              </button>
                             </td>
                           </tr>
                         ))}

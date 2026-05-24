@@ -130,4 +130,34 @@ const rejectStudent = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, message: 'Student registration rejected', data: registration });
 });
 
-module.exports = { getAllUsers, getPendingStudents, approveStudent, rejectStudent };
+const deleteStudent = asyncHandler(async (req, res) => {
+  const student = await User.findById(req.params.id);
+
+  if (!student) {
+    throw new ApiError(404, 'Student not found');
+  }
+
+  if (student.role !== 'student') {
+    throw new ApiError(400, 'Only student accounts can be deleted from this action');
+  }
+
+  if (student.course) {
+    await Course.findByIdAndUpdate(student.course, {
+      $pull: { students: student._id },
+    });
+  }
+
+  await StudentRegistration.updateMany(
+    { user: student._id },
+    { $set: { user: null } }
+  );
+
+  await User.findByIdAndDelete(student._id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Student deleted successfully',
+  });
+});
+
+module.exports = { getAllUsers, getPendingStudents, approveStudent, rejectStudent, deleteStudent };

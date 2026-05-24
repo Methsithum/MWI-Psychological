@@ -129,6 +129,12 @@ export default {
     });
   },
 
+  async deleteStudent(studentId) {
+    return request(`/api/users/students/${encodeURIComponent(studentId)}`, {
+      method: 'DELETE'
+    });
+  },
+
   async getDashboardSummary() {
     return request('/api/dashboard/summary');
   },
