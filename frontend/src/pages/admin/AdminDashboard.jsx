@@ -330,7 +330,7 @@ const AdminDashboard = () => {
 
       {/* Admin Navbar - Mobile Responsive */}
       <nav className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] text-white sticky top-0 z-50 shadow-xl">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="max-w-8xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#D4AF37] to-[#C49B2C] rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
