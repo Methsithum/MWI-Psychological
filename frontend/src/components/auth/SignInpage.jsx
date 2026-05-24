@@ -156,7 +156,7 @@ const SignInpage = () => {
                         className={`w-full pl-10 pr-12 p-2.5 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
                           errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200'
                         }`}
-                        placeholder="Enter your NIC number"
+                        placeholder="Enter your password"
                       />
                       <button
                         type="button"
