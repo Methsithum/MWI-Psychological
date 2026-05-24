@@ -10,10 +10,12 @@ import {
 import { MdOutlineAssignment, MdOutlineDescription } from 'react-icons/md';
 import { HiOutlineAcademicCap } from 'react-icons/hi';
 import { toast, Toaster } from 'react-hot-toast';
+import auth from '../../utils/auth';
 import api from '../../utils/api';
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(() => auth.getUser());
   const [activeTab, setActiveTab] = useState('announcements');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -209,6 +211,24 @@ const TeacherDashboard = () => {
       refreshCourseData(selectedCourse);
     }
   }, [selectedCourse]);
+
+  useEffect(() => {
+    let active = true;
+
+    api.getCurrentUser()
+      .then((response) => {
+        if (active && response?.data) {
+          setCurrentUser(response.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load current user', error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const addActivity = (action, type) => {
     const activities = JSON.parse(localStorage.getItem('systemActivities') || '[]');
@@ -490,7 +510,7 @@ const TeacherDashboard = () => {
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-[#D4AF37]/30 rounded-full flex items-center justify-center">
                   <FaChalkboardTeacher className="text-xs sm:text-sm" />
                 </div>
-                <span className="text-xs sm:text-sm hidden md:block">K.M. Imasha</span>
+                <span className="text-xs sm:text-sm hidden md:block">{currentUser?.fullName || 'Lecturer'}</span>
               </div>
               <button 
                 onClick={() => navigate('/')}

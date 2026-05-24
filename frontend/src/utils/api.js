@@ -301,6 +301,10 @@ export default {
     });
   },
 
+  async getCurrentUser() {
+    return request('/api/auth/me');
+  },
+
   async changePassword(currentPassword, newPassword) {
     return request('/api/auth/change-password', {
       method: 'PATCH',

@@ -13,6 +13,7 @@ import {
 import { MdOutlineAssignment, MdOutlineDescription } from 'react-icons/md';
 import { HiOutlineAcademicCap } from 'react-icons/hi';
 import { toast, Toaster } from 'react-hot-toast';
+import auth from '../../utils/auth';
 import api from '../../utils/api';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5000').replace(/\/$/, '');
@@ -25,6 +26,7 @@ const resolveMediaUrl = (url) => {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(() => auth.getUser());
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedUser, setSelectedUser] = useState(null);
   const [showSlipModal, setShowSlipModal] = useState(false);
@@ -127,16 +129,31 @@ const AdminDashboard = () => {
   useEffect(() => {
     loadDashboardData();
 
+    let active = true;
+    api.getCurrentUser()
+      .then((response) => {
+        if (active && response?.data) {
+          setCurrentUser(response.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load current user', error);
+      });
+
     const activities = JSON.parse(localStorage.getItem('systemActivities') || '[]');
     if (activities.length === 0) {
       const defaultActivities = [
-        { id: 1, action: 'Admin dashboard accessed', user: 'Admin', time: new Date().toLocaleString(), type: 'system' },
+        { id: 1, action: 'Admin dashboard accessed', user: currentUser?.fullName || 'Admin', time: new Date().toLocaleString(), type: 'system' },
       ];
       setSystemActivities(defaultActivities);
       localStorage.setItem('systemActivities', JSON.stringify(defaultActivities));
     } else {
       setSystemActivities(activities);
     }
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -336,13 +353,9 @@ const AdminDashboard = () => {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#D4AF37] to-[#C49B2C] rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
                 <HiOutlineAcademicCap className="text-lg sm:text-2xl text-[#0B1F3A]" />
               </div>
-              <div className="hidden sm:block">
-                <h1 className="font-bold text-base sm:text-lg">Admin Dashboard</h1>
+              <div>
+                <h1 className="font-bold text-base sm:text-lg leading-tight">Admin Dashboard</h1>
                 <p className="text-[10px] sm:text-xs text-white/60">PWI Psychological Institute</p>
-              </div>
-              <div className="block sm:hidden">
-                <h1 className="font-bold text-sm">Admin</h1>
-                <p className="text-[10px] text-white/60">Dashboard</p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -350,7 +363,9 @@ const AdminDashboard = () => {
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-[#D4AF37]/30 rounded-full flex items-center justify-center">
                   <FaUserGraduate className="text-xs sm:text-sm" />
                 </div>
-                <span className="text-xs sm:text-sm hidden xs:inline-block">Admin</span>
+                <span className="text-xs sm:text-sm font-medium max-w-[140px] truncate">
+                  {currentUser?.fullName || 'Admin'}
+                </span>
               </div>
               <button 
                 onClick={() => {

@@ -174,4 +174,33 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { login, registerStudent, changePassword };
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+    .select('-password')
+    .populate('course', 'title code');
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+      forcePasswordChange: user.forcePasswordChange,
+      course: user.course
+        ? {
+            id: user.course._id,
+            title: user.course.title,
+            code: user.course.code,
+          }
+        : null,
+    },
+  });
+});
+
+module.exports = { login, registerStudent, changePassword, getCurrentUser };
