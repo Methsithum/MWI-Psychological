@@ -4,6 +4,9 @@ import Navbar from "../../components/common/Navbar";
 import Footer from "../../components/common/Footer";
 import lecturerImage from "../../assets/lectimg.jpeg";
 
+import {FaWhatsapp } from 'react-icons/fa';
+
+
 const AboutPage = () => {
   const qualifications = [
     "BA (Hons) Psychology – University of Kelaniya",
@@ -42,11 +45,16 @@ const AboutPage = () => {
     }
   ];
 
+  // WhatsApp configuration
+  const whatsappNumber = "94768856172";
+  const whatsappMessage = "Hello! I'm interested in the psychology diploma programs at MWI Psychological. I would like to get more information about the courses and admission process.";
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <div className="min-h-screen bg-[#FCFAF5]">
       <Navbar />
 
-      {/* Hero Section - Mobile Responsive */}
+      {/* Hero Section */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden bg-[#0B1F3A]">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-48 h-48 md:w-72 md:h-72 bg-[#D4AF37] rounded-full blur-3xl"></div>
@@ -62,7 +70,7 @@ const AboutPage = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-5 leading-tight">
             About{' '}
             <span className="text-[#D4AF37] relative inline-block">
-              PWI Psychological
+              MWI Psychological
               <svg className="absolute bottom-0 left-0 w-full h-2 md:h-3 text-[#D4AF37]/40" viewBox="0 0 200 10" preserveAspectRatio="none">
                 <path d="M0 5 Q 50 10 100 5 T 200 5" stroke="currentColor" fill="none" strokeWidth="2"/>
               </svg>
@@ -75,7 +83,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Our Story Section - Mobile Responsive */}
+      {/* Our Story Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
@@ -87,7 +95,7 @@ const AboutPage = () => {
               <div className="w-12 h-0.5 bg-[#D4AF37] mb-4 md:mb-6"></div>
               
               <p className="text-sm md:text-base text-[#5A6A7A] leading-relaxed mb-3 md:mb-4">
-                PWI Psychological is a newly launched educational institute
+                MWI Psychological is a newly launched educational institute
                 dedicated to psychology, counselling, HRM, and behavioral development.
               </p>
 
@@ -141,7 +149,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Lecturer Section - Completely Redesigned */}
+      {/* Lecturer Section */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-white to-[#F8F4EC]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
@@ -159,15 +167,15 @@ const AboutPage = () => {
               <div className="lg:w-2/5 relative">
                 <div 
                   className="h-80 md:h-96 lg:h-full w-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${lecturerImage}` }}
+                  style={{ backgroundImage: `url(${lecturerImage})` }}
                 >
-                  <div className="absolute inset-0 "></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-l-2xl"></div>
                 </div>
                 
                 {/* Name Badge - Mobile */}
                 <div className="absolute bottom-4 left-4 right-4 lg:hidden">
                   <div className="bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-lg border border-[#D4AF37]/20">
-                    <h3 className="text-lg font-bold text-[#0B1F3A]">K.M. Imasha Isurunee</h3>
+                    <h3 className="text-lg font-bold text-[#0B1F3A]">K.M. Imasha Isurune</h3>
                     <p className="text-[#D4AF37] text-xs mt-0.5">Psychologist | Lecturer | Counsellor</p>
                     <p className="text-gray-500 text-xs mt-0.5">ඉසුරුණී මුදලිගේ</p>
                   </div>
@@ -178,19 +186,19 @@ const AboutPage = () => {
               <div className="lg:w-3/5 p-5 md:p-6 lg:p-8">
                 {/* Name - Desktop only */}
                 <div className="hidden lg:block mb-5">
-                  <h3 className="text-2xl font-bold text-[#0B1F3A]">K.M. Imasha Isurunee</h3>
+                  <h3 className="text-2xl font-bold text-[#0B1F3A]">K.M. Imasha Isurune</h3>
                   <p className="text-[#D4AF37] text-sm mt-1">Psychologist | Lecturer | Counsellor | Ayurvedic Therapist</p>
                   <p className="text-gray-500 text-sm mt-1">ඉසුරුණී මුදලිගේ</p>
                   <div className="w-12 h-0.5 bg-[#D4AF37] mt-3"></div>
                 </div>
 
                 <p className="text-sm md:text-base text-[#5A6A7A] leading-relaxed mb-5 md:mb-6">
-                  K.M. Imasha Isurunee is a psychology lecturer, counsellor, and
+                  K.M. Imasha Isurune is a psychology lecturer, counsellor, and
                   behavioural psychology educator specializing in emotional wellbeing,
                   counselling, mindfulness, and human behaviour studies.
                 </p>
 
-                {/* Qualifications - Accordion Style Cards */}
+                {/* Qualifications */}
                 <div className="mb-5 md:mb-6">
                   <h4 className="text-base md:text-lg font-bold text-[#0B1F3A] mb-3 flex items-center gap-2">
                     <span className="text-[#D4AF37] text-lg">📚</span>
@@ -226,19 +234,22 @@ const AboutPage = () => {
                   </div>
                 </div>
 
-                {/* Contact Card */}
+                {/* Contact Card with WhatsApp */}
                 <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#F5E6A8]/20 rounded-xl p-4 border border-[#D4AF37]/20">
                   <h4 className="font-bold text-[#0B1F3A] mb-2 text-sm md:text-base flex items-center gap-2">
                     <span>📞</span>
                     Contact Information
                   </h4>
-                  <div className="space-y-1.5">
-                    <p className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2 break-all">
+                  <div className="space-y-2">
+                    <a href="mailto:psychologicalinstitute351@gmail.com" className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2 break-all hover:text-[#D4AF37] transition">
                       <span>📧</span> psychologicalinstitute351@gmail.com
-                    </p>
-                    <p className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2">
-                      <span>📞</span> 076 885 6172 (WhatsApp & Registration)
-                    </p>
+                    </a>
+                    <a href="tel:+94768856172" className="text-[#5A6A7A] text-xs md:text-sm flex items-center gap-2 hover:text-[#D4AF37] transition">
+                      <span>📞</span> 076 885 6172
+                    </a>
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-green-600 text-xs md:text-sm flex items-center gap-2 hover:text-green-700 transition">
+                      <span>💬</span> 076 885 6172 (WhatsApp)
+                    </a>
                   </div>
                 </div>
               </div>
@@ -247,13 +258,13 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Why Choose Us - Mobile Responsive */}
+      {/* Why Choose Us */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-16">
             <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">Why Choose Us</span>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#0B1F3A] mt-2 md:mt-3">
-              Reasons to Trust PWI
+              Reasons to Trust MWI
             </h2>
             <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-3 md:mt-4"></div>
             <p className="text-sm md:text-base text-[#5A6A7A] max-w-2xl mx-auto mt-3 md:mt-4 px-4">
@@ -282,7 +293,33 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* CTA Section - Mobile Responsive */}
+      {/* WhatsApp Contact Banner */}
+      <section className="py-12 bg-gradient-to-r from-green-600 to-green-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <div className="flex items-center gap-3 justify-center md:justify-start">
+                <span className="text-4xl"><FaWhatsapp size={60} color="white" /></span>
+                <div>
+                  <h3 className="text-white font-bold text-xl">Have Questions?</h3>
+                  <p className="text-green-100 text-sm">Chat with us directly on WhatsApp</p>
+                </div>
+              </div>
+            </div>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-3 bg-white text-green-600 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl"
+            >
+              <span className="text-xl"><FaWhatsapp size={16} /></span>
+              Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
       <section className="py-16 md:py-24 relative">
         <div className="absolute inset-0 bg-gradient-to-br from-[#0B1F3A] to-[#08162A]"></div>
         <div className="absolute inset-0 opacity-10">
@@ -298,17 +335,41 @@ const AboutPage = () => {
             <p className="text-sm md:text-base text-[#D1D8E0] mb-5 md:mb-8">
               Join our upcoming batch and begin your psychology education today
             </p>
-            <Link to="/register">
-              <button className="inline-flex items-center gap-2 px-5 md:px-8 py-2 md:py-3 bg-[#D4AF37] text-[#0B1F3A] rounded-full font-bold text-sm md:text-base hover:bg-[#C49B2C] hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-                Enroll Now
-                <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/register">
+                <button className="inline-flex items-center gap-2 px-5 md:px-8 py-2 md:py-3 bg-[#D4AF37] text-[#0B1F3A] rounded-full font-bold text-sm md:text-base hover:bg-[#C49B2C] hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+                  Enroll Now
+                  <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </Link>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 md:px-8 py-2 md:py-3 bg-white/20 text-white rounded-full font-bold text-sm md:text-base hover:bg-white/30 transition-all duration-300"
+              >
+                <span><FaWhatsapp size={20} color="white" /></span>
+                Chat on WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Floating WhatsApp Button */}
+      <a
+        href={whatsappLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-600 transition-all duration-300 hover:scale-110 group"
+      >
+        <span className="text-2xl"><FaWhatsapp size={30} color="white" /></span>
+        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 hover:bg-[#128C7E] transition whitespace-nowrap">
+          Chat on WhatsApp
+        </span>
+      </a>
 
       <Footer />
     </div>

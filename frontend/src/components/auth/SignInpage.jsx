@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../common/Navbar';
 import Footer from '../common/Footer';
+import api from '../../utils/api';
+import auth from '../../utils/auth';
 
 const SignInpage = () => {
   const navigate = useNavigate();
@@ -25,8 +27,6 @@ const SignInpage = () => {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
@@ -50,44 +50,54 @@ const SignInpage = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       
-      setTimeout(() => {
-        setIsSubmitting(false);
-        if (formData.rememberMe) {
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userEmail', formData.email);
+      try {
+        const res = await api.login(formData.email, formData.password);
+        if (res && res.token) {
+          auth.setToken(res.token, formData.rememberMe);
+          auth.setUser(res.user, formData.rememberMe);
+          alert(`Welcome back ${res.user.fullName || res.user.email}!`);
+          navigate(auth.getDashboardPath(res.user.role));
         } else {
-          sessionStorage.setItem('isLoggedIn', 'true');
-          sessionStorage.setItem('userEmail', formData.email);
+          alert(res.message || 'Invalid email or password. If you registered, wait for approval.');
         }
-        alert('Login successful! Redirecting to dashboard...');
-        navigate('/');
-      }, 1500);
+      } catch (err) {
+        console.error('Login error:', err);
+        alert(err?.message || 'Invalid email or password. Try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   const handleForgotPassword = () => {
-    alert('Password reset link will be sent to your registered email address.');
+    alert('Your password is your NIC number. If you forgot, please contact admin.');
+  };
+
+  const fillDemoCredentials = () => {
+    setFormData({
+      ...formData,
+      email: 'student@pwi.lk',
+      password: '987654321V'
+    });
   };
 
   return (
     <div className="min-h-screen bg-[#FCFAF5]">
       <Navbar />
 
-      {/* Sign In Section with Right Banner */}
-      <section className="pt-20 pb-16 md:pt-28 md:pb-20">
+      <section className="pt-16 pb-12 md:pt-20 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-8 items-center">
             
             {/* Left Side - Sign In Form */}
             <div className="order-2 lg:order-1">
-              {/* Error Summary */}
               {Object.keys(errors).length > 0 && (
-                <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 animate-fadeIn">
-                  <div className="flex items-start gap-3">
-                    <span className="text-red-500 text-lg">⚠️</span>
+                <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="text-red-500 text-base">⚠️</span>
                     <div>
-                      <h4 className="font-semibold text-red-700 text-sm">Please fix the following errors:</h4>
-                      <ul className="list-disc list-inside mt-1 text-red-600 text-xs">
+                      <h4 className="font-semibold text-red-700 text-xs">Please fix the following errors:</h4>
+                      <ul className="list-disc list-inside mt-1 text-red-600 text-[11px]">
                         {Object.values(errors).map((error, idx) => (
                           <li key={idx}>{error}</li>
                         ))}
@@ -97,17 +107,15 @@ const SignInpage = () => {
                 </div>
               )}
 
-              {/* Sign In Card */}
               <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden border border-[#D4AF37]/20">
-                <div className="px-6 md:px-8 pt-6 md:pt-8 pb-2">
+                <div className="px-6 md:px-8 pt-5 md:pt-6 pb-1">
                   <h2 className="text-2xl md:text-3xl font-bold text-[#0B1F3A]">Welcome Back</h2>
                   <p className="text-gray-500 text-sm mt-1">Sign in to continue your learning journey</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
-                  {/* Email Field */}
+                <form onSubmit={handleSubmit} className="p-5 md:p-6 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-[#0B1F3A] mb-2">
+                    <label className="block text-sm font-medium text-[#0B1F3A] mb-1.5">
                       Email Address
                     </label>
                     <div className="relative">
@@ -121,7 +129,7 @@ const SignInpage = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full pl-10 p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        className={`w-full pl-10 p-2.5 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
                           errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'
                         }`}
                         placeholder="your@email.com"
@@ -130,9 +138,8 @@ const SignInpage = () => {
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
 
-                  {/* Password Field */}
                   <div>
-                    <label className="block text-sm font-medium text-[#0B1F3A] mb-2">
+                    <label className="block text-sm font-medium text-[#0B1F3A] mb-1.5">
                       Password
                     </label>
                     <div className="relative">
@@ -146,7 +153,7 @@ const SignInpage = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        className={`w-full pl-10 pr-12 p-3 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
+                        className={`w-full pl-10 pr-12 p-2.5 border rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition ${
                           errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200'
                         }`}
                         placeholder="Enter your password"
@@ -167,9 +174,9 @@ const SignInpage = () => {
                       </button>
                     </div>
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    <p className="text-xs text-gray-400 mt-1">⚠️ Your password is your NIC number provided during registration</p>
                   </div>
 
-                  {/* Remember Me & Forgot Password */}
                   <div className="flex items-center justify-between">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -190,11 +197,10 @@ const SignInpage = () => {
                     </button>
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full py-3 md:py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
+                    className={`w-full py-2.5 md:py-3 bg-linear-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-xl font-bold text-base hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 ${
                       isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                     }`}
                   >
@@ -211,8 +217,7 @@ const SignInpage = () => {
                     )}
                   </button>
 
-                  {/* Sign Up Link */}
-                  <div className="text-center pt-2">
+                  <div className="text-center pt-1">
                     <p className="text-sm text-gray-600">
                       Don't have an account?{' '}
                       <Link to="/register" className="text-[#D4AF37] font-semibold hover:underline transition">
@@ -226,33 +231,32 @@ const SignInpage = () => {
 
             {/* Right Side - Big Banner */}
             <div className="order-1 lg:order-2">
-              <div className="relative bg-gradient-to-br from-[#0B1F3A] to-[#1A3A5A] rounded-2xl md:rounded-3xl p-8 md:p-12 text-white shadow-2xl overflow-hidden">
-                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+              <div className="relative bg-linear-to-br from-[#0B1F3A] to-[#1A3A5A] rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-2xl overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
                 
                 <div className="relative z-10 text-center">
-                  <div className="text-6xl md:text-7xl mb-6">🎓</div>
-                  <h2 className="text-2xl md:text-3xl font-bold mb-4">Start Your Journey in Psychology</h2>
-                  <p className="text-white/80 text-sm md:text-base mb-6 leading-relaxed">
+                  <div className="text-5xl md:text-6xl mb-4">🎓</div>
+                  <h2 className="text-xl md:text-2xl font-bold mb-3">Start Your Journey in Psychology</h2>
+                  <p className="text-white/80 text-sm md:text-base mb-4 leading-relaxed">
                     Join our professional diploma programs and transform your career with expert guidance and comprehensive learning.
                   </p>
                   
-                  <div className="flex flex-col gap-3 mb-6">
+                  <div className="flex flex-col gap-2 mb-4">
                     <div className="flex items-center justify-center gap-2 text-sm">
-                      <svg className="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span>100% Online Learning</span>
                     </div>
                     <div className="flex items-center justify-center gap-2 text-sm">
-                      <svg className="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span>Expert Faculty Guidance</span>
                     </div>
                     <div className="flex items-center justify-center gap-2 text-sm">
-                      <svg className="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span>Recognized Diploma Certificate</span>
@@ -260,16 +264,14 @@ const SignInpage = () => {
                   </div>
 
                   <Link to="/register">
-                    <button className="w-full py-3 bg-[#D4AF37] text-[#0B1F3A] rounded-xl font-bold hover:bg-[#C49B2C] transition-all duration-300">
+                    <button className="w-full py-2.5 bg-[#D4AF37] text-[#0B1F3A] rounded-xl font-bold hover:bg-[#C49B2C] transition-all duration-300">
                       Register Now
                     </button>
                   </Link>
                   
-                  <p className="text-white/40 text-xs mt-4">Limited seats available for upcoming batch</p>
+                  <p className="text-white/40 text-xs mt-3">Limited seats available for upcoming batch</p>
                 </div>
               </div>
-
-             
             </div>
           </div>
         </div>

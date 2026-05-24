@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 // Import your logo image (replace with your actual logo path)
 import logo from '../../assets/logo.png';
+import auth from '../../utils/auth';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    setUser(auth.getUser());
+  }, []);
+
+  const handleLogout = () => {
+    auth.logout();
+    setUser(null);
+    // reload to reset UI; alternatively use context/router
+    window.location.href = '/';
+  };
 
   return (
     <nav className="bg-white/90 backdrop-blur-md shadow-lg fixed w-full z-50 top-0 border-b border-[#D4AF37]/20">
@@ -16,7 +29,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center group">
               {/* Logo Image */}
-              <div className="w-10 h-10 md:w-15 md:h-15 relative">
+              <div className="w-10 h-10 md:w-15 md:h-15 relative space-y-5 mr-3">
                 <img 
                   src={logo} 
                   alt="PWI Psychological Logo"
@@ -27,7 +40,7 @@ const Navbar = () => {
               {/* Text Logo (fallback if image fails) */}
               <div className="hidden sm:block">
                 <span className="font-bold text-lg md:text-xl text-[#0B1F3A] tracking-wide">
-                  PWI Psychological
+                  MWI  මනෝවිද්‍යාත්මක ආයතනය
                 </span>
                 <span className="block text-[10px] md:text-xs text-[#D4AF37] font-semibold tracking-wider uppercase">
                   Professional Diploma Programmes
@@ -81,17 +94,28 @@ const Navbar = () => {
 
           {/* AUTH BUTTONS - Modern Design */}
           <div className="hidden md:flex items-center space-x-3">
-            <Link to="/login">
-              <button className="px-5 py-2 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A] hover:text-amber-50 transition duration-300 font-medium text-sm">
-                Sign In
-              </button>
-            </Link>
+            {!user ? (
+              <>
+                <Link to="/signin">
+                  <button className="px-5 py-2 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A] hover:text-amber-50 transition duration-300 font-medium text-sm">
+                    Sign In
+                  </button>
+                </Link>
 
-            <Link to="/register">
-              <button className="px-6 py-2 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg hover:scale-105 transform transition duration-300 font-bold text-sm">
-                Register Now
-              </button>
-            </Link>
+                <Link to="/register">
+                  <button className="px-6 py-2 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg hover:scale-105 transform transition duration-300 font-bold text-sm">
+                    Register Now
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link to="/dashboard" className="text-sm font-medium text-[#0B1F3A] hover:text-[#D4AF37]">
+                  {user.fullName || user.email}
+                </Link>
+                <button onClick={handleLogout} className="px-4 py-2 text-sm bg-white border rounded-full hover:bg-[#F8F4EC]">Logout</button>
+              </div>
+            )}
           </div>
 
           {/* MOBILE BUTTON */}
@@ -173,17 +197,23 @@ const Navbar = () => {
 
             {/* MOBILE BUTTONS */}
             <div className="pt-5 space-y-3">
-              <Link to="/login" className="block" onClick={() => setIsOpen(false)}>
+              <Link to="/signin" className="block" onClick={() => setIsOpen(false)}>
                 <button className="w-full px-4 py-3 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A]/5 transition duration-300 font-medium">
                   Sign In
                 </button>
               </Link>
 
-              <Link to="/register" className="block" onClick={() => setIsOpen(false)}>
-                <button className="w-full px-4 py-3 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg transition duration-300 font-bold">
-                  Register Now
-                </button>
-              </Link>
+              {!user ? (
+                <Link to="/register" className="block" onClick={() => setIsOpen(false)}>
+                  <button className="w-full px-4 py-3 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg transition duration-300 font-bold">
+                    Register Now
+                  </button>
+                </Link>
+              ) : (
+                <div className="px-4">
+                  <button onClick={handleLogout} className="w-full px-4 py-3 bg-white text-[#0B1F3A] rounded-full border">Logout</button>
+                </div>
+              )}
             </div>
           </div>
         )}

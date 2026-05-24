@@ -1,6 +1,6 @@
 require('dotenv').config();
+require('./config/cloudinary');
 const connectDB = require('./config/db');
-const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,6 +20,8 @@ const submissionRoutes = require('./routes/submissionRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const fileRoutes = require('./routes/fileRoutes');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -37,8 +39,6 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'LMS API is running' });
 });
 
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
@@ -50,6 +50,8 @@ app.use('/api/submissions', submissionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/files', fileRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaFacebookF, FaInstagram, FaTiktok, FaYoutube, FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
 
@@ -22,30 +23,32 @@ const ContactPage = () => {
 
   const contactInfo = [
     {
-      icon: "📍",
+      icon: <FaMapMarkerAlt className="text-3xl md:text-4xl" />,
       title: "Visit Us",
-      description: "PWI Psychological Learning Center, Colombo, Sri Lanka",
+      description: "MWI Psychological Learning Center, Colombo, Sri Lanka",
       color: "from-[#0B1F3A] to-[#1A3A5A]"
     },
     {
-      icon: "📧",
+      icon: <FaEnvelope className="text-3xl md:text-4xl" />,
       title: "Email Us",
       description: "psychologicalinstitute351@gmail.com",
       link: "mailto:psychologicalinstitute351@gmail.com",
       color: "from-[#D4AF37] to-[#C49B2C]"
     },
     {
-      icon: "📞",
-      title: "Call / WhatsApp",
+      icon: <FaPhoneAlt className="text-3xl md:text-4xl" />,
+      title: "Call Us",
       description: "076 885 6172",
       link: "tel:0768856172",
       color: "from-[#0B1F3A] to-[#1A3A5A]"
     },
     {
-      icon: "⏰",
-      title: "Office Hours",
-      description: "Monday - Friday: 9:00 AM - 6:00 PM",
-      color: "from-[#D4AF37] to-[#C49B2C]"
+      icon: <FaWhatsapp className="text-3xl md:text-4xl" />,
+      title: "WhatsApp Us",
+      description: "076 885 6172",
+      link: "https://wa.me/94768856172",
+      color: "from-[#25D366] to-[#128C7E]",
+      isWhatsApp: true
     }
   ];
 
@@ -73,6 +76,33 @@ const ContactPage = () => {
     {
       q: "Do I get study materials?",
       a: "Yes, you will receive PDF notes, lecture recordings, and additional reference materials."
+    }
+  ];
+
+  const socialLinks = [
+    { 
+      icon: <FaFacebookF />, 
+      name: "Facebook", 
+      url: "https://www.facebook.com/share/1CjeFTX9Cu/?mibextid=wwXIfr", 
+      color: "hover:bg-[#1877f2]" 
+    },  { 
+      icon: <FaYoutube />, 
+      name: "YouTube", 
+      url: "https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX", 
+      color: "hover:bg-[#ff0000]" 
+    },
+     { 
+      icon: <FaTiktok />, 
+      name: "TikTok", 
+      url: "https://www.tiktok.com/@mindfulwithisuruni", 
+      color: "hover:bg-[#da148e]" 
+    }, 
+   
+    { 
+      icon: <FaWhatsapp />, 
+      name: "WhatsApp", 
+      url: "https://wa.me/94768856172", 
+      color: "hover:bg-[#25D366]" 
     }
   ];
 
@@ -109,6 +139,20 @@ const ContactPage = () => {
         </div>
       </section>
 
+      {/* Floating WhatsApp Button - Clickable */}
+      <a
+        href="https://wa.me/94768856172"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+        aria-label="Chat on WhatsApp"
+      >
+        <FaWhatsapp size={30} />
+        <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+          Chat with us on WhatsApp
+        </span>
+      </a>
+
       {/* Contact Info & Form Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -126,11 +170,17 @@ const ContactPage = () => {
                     key={i}
                     className={`group bg-gradient-to-br ${item.color} rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
                   >
-                    <div className="text-3xl md:text-4xl mb-3">{item.icon}</div>
+                    <div className="mb-3">{item.icon}</div>
                     <h3 className="font-semibold text-sm md:text-base mb-1">{item.title}</h3>
                     {item.link ? (
-                      <a href={item.link} className="text-white/80 text-xs md:text-sm hover:text-white transition">
+                      <a 
+                        href={item.link} 
+                        target={item.isWhatsApp ? "_blank" : "_self"}
+                        rel={item.isWhatsApp ? "noopener noreferrer" : ""}
+                        className="text-white/80 text-xs md:text-sm hover:text-white transition break-words flex items-center gap-1"
+                      >
                         {item.description}
+                        {item.isWhatsApp && <span className="text-xs">↗</span>}
                       </a>
                     ) : (
                       <p className="text-white/80 text-xs md:text-sm">{item.description}</p>
@@ -139,20 +189,18 @@ const ContactPage = () => {
                 ))}
               </div>
 
-              {/* Social Links */}
+              {/* Social Links with React Icons */}
               <div className="mt-8 pt-6 border-t border-[#D4AF37]/20">
                 <h3 className="font-semibold text-[#0B1F3A] mb-4">Follow Us</h3>
-                <div className="flex gap-3">
-                  {[
-                    { icon: "📘", name: "Facebook", color: "hover:bg-[#1877f2]" },
-                    { icon: "📸", name: "Instagram", color: "hover:bg-[#e4405f]" },
-                    { icon: "💼", name: "LinkedIn", color: "hover:bg-[#0a66c2]" },
-                    { icon: "▶️", name: "YouTube", color: "hover:bg-[#ff0000]" }
-                  ].map((social, idx) => (
+                <div className="flex gap-3 flex-wrap">
+                  {socialLinks.map((social, idx) => (
                     <a
                       key={idx}
-                      href="#"
-                      className={`w-10 h-10 bg-[#0B1F3A]/10 rounded-full flex items-center justify-center text-lg hover:scale-110 transition-all duration-300 ${social.color} hover:text-white`}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`w-10 h-10 bg-[#0B1F3A]/10 rounded-full flex items-center justify-center text-[#0B1F3A] hover:text-white transition-all duration-300 hover:scale-110 ${social.color}`}
+                      aria-label={social.name}
                     >
                       {social.icon}
                     </a>
@@ -165,7 +213,7 @@ const ContactPage = () => {
             <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl p-6 md:p-8 border border-[#D4AF37]/20">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 bg-[#D4AF37]/10 rounded-xl flex items-center justify-center">
-                  <span className="text-xl">✉️</span>
+                  <FaEnvelope className="text-xl text-[#D4AF37]" />
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-[#0B1F3A]">
                   Send Message
@@ -256,8 +304,8 @@ const ContactPage = () => {
           <div className="bg-[#F8F4EC] rounded-2xl p-6 md:p-8 text-center">
             <div className="w-full h-48 md:h-64 bg-gray-200 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#0B1F3A] to-[#1A3A5A]">
               <div className="text-center text-white">
-                <div className="text-5xl mb-3">📍</div>
-                <p className="text-sm md:text-base">PWI Psychological Learning Center</p>
+                <FaMapMarkerAlt className="text-5xl mb-3 mx-auto" />
+                <p className="text-sm md:text-base">MWI Psychological Learning Center</p>
                 <p className="text-white/70 text-xs md:text-sm mt-1">Colombo, Sri Lanka</p>
                 <p className="text-[#D4AF37] text-xs mt-3">Interactive map coming soon</p>
               </div>
@@ -266,7 +314,7 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* FAQ Section - Modern Accordion Style */}
+      {/* FAQ Section */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-[#F8F4EC] to-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-12">
@@ -333,6 +381,15 @@ const ContactPage = () => {
                   How to Apply
                 </button>
               </Link>
+              <a
+                href="https://wa.me/94768856172"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 md:px-8 py-2.5 md:py-3 bg-[#25D366] text-white rounded-full font-semibold text-sm md:text-base hover:bg-[#128C7E] transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+              >
+                <FaWhatsapp size={16} />
+                Chat on WhatsApp
+              </a>
             </div>
           </div>
         </div>

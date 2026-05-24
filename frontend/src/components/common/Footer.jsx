@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaTwitter, FaEnvelope, FaPhoneAlt, FaWhatsapp, FaClock, FaTiktok } from 'react-icons/fa';
+import logo from '../../assets/logo.png';
 
 const Footer = () => {
   const quickLinks = [
@@ -35,11 +37,16 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#C49B2C] rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-[#0B1F3A] font-bold text-lg">PWI</span>
+              {/* Bigger Logo Image */}
+              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-[#D4AF37] to-[#C49B2C] flex items-center justify-center shadow-lg">
+                <img 
+                  src={logo} 
+                  alt="MWI Psychological Logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
-                <h2 className="font-bold text-lg md:text-xl text-white">PWI Psychological</h2>
+                <h2 className="font-bold text-lg md:text-xl text-white">MWI Psychological</h2>
                 <p className="text-xs text-[#D4AF37] font-medium tracking-wide">
                   Professional Diploma Programmes
                 </p>
@@ -50,23 +57,37 @@ const Footer = () => {
               Transforming lives through psychology, counselling, HRM, and behavioral education.
             </p>
 
-            {/* Social Icons */}
+            {/* Social Icons with React Icons */}
             <div className="flex gap-3 mt-5 justify-center sm:justify-start">
-              {[
-                { icon: "📘", label: "Facebook" },
-                { icon: "📸", label: "Instagram" },
-                { icon: "💼", label: "LinkedIn" },
-                { icon: "▶️", label: "YouTube" }
-              ].map((social, idx) => (
-                <a
-                  key={idx}
-                  href="#"
-                  className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-sm hover:bg-[#D4AF37] hover:text-[#0B1F3A] transition-all duration-300 hover:scale-110"
-                  aria-label={social.label}
-                >
-                  {social.icon}
-                </a>
-              ))}
+              <a
+                href="https://www.facebook.com/share/1CjeFTX9Cu/?mibextid=wwXIfr"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#1877f2] transition-all duration-300 hover:scale-110"
+                aria-label="Facebook"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaFacebookF size={14} />
+              </a>
+              
+              <a
+                href="https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#ff0000] transition-all duration-300 hover:scale-110"
+                aria-label="YouTube"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaYoutube size={14} />
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@.psychological.in?_r=1&_t=ZS-96Zxb5kJrz6"
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-[#da148e]transition-all duration-300 hover:scale-110"
+                aria-label="Tiktok "
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaTiktok size={14} />
+              </a>
             </div>
           </div>
 
@@ -88,7 +109,7 @@ const Footer = () => {
                   </Link>
                 </li>
               ))}
-            </ul>
+            </ul> 
           </div>
 
           {/* Program Section */}
@@ -121,7 +142,7 @@ const Footer = () => {
                 href="mailto:psychologicalinstitute351@gmail.com" 
                 className="flex items-center gap-3 text-gray-300 hover:text-[#D4AF37] transition duration-300 text-sm group justify-center sm:justify-start"
               >
-                <span className="text-lg group-hover:scale-110 transition">📧</span>
+                <FaEnvelope className="text-lg group-hover:scale-110 transition" />
                 <span className="break-all">psychologicalinstitute351@gmail.com</span>
               </a>
               
@@ -129,18 +150,24 @@ const Footer = () => {
                 href="tel:0768856172" 
                 className="flex items-center gap-3 text-gray-300 hover:text-[#D4AF37] transition duration-300 text-sm group justify-center sm:justify-start"
               >
-                <span className="text-lg group-hover:scale-110 transition">📞</span>
+                <FaPhoneAlt className="text-lg group-hover:scale-110 transition" />
                 <span>+94 76 885 6172</span>
               </a>
               
-              <div className="flex items-center gap-3 text-gray-300 text-sm justify-center sm:justify-start">
-                <span className="text-lg">💬</span>
+              <a 
+                href="https://wa.me/94768856172" 
+                className="flex items-center gap-3 text-gray-300 hover:text-[#D4AF37] transition duration-300 text-sm group justify-center sm:justify-start"
+              >
+                <FaWhatsapp className="text-lg group-hover:scale-110 transition" />
                 <span>WhatsApp • Registration • Support</span>
-              </div>
+              </a>
 
               <div className="pt-3">
                 <div className="bg-[#D4AF37]/10 rounded-xl p-3 text-center sm:text-left">
-                  <p className="text-[#D4AF37] text-xs font-semibold mb-1">📅 Office Hours</p>
+                  <div className="flex items-center gap-2 text-[#D4AF37] text-xs font-semibold mb-1">
+                    <FaClock size={12} />
+                    <span>Office Hours</span>
+                  </div>
                   <p className="text-gray-300 text-xs">Mon - Fri: 9:00 AM - 6:00 PM</p>
                   <p className="text-gray-300 text-xs">Saturday: 9:00 AM - 1:00 PM</p>
                 </div>
@@ -174,7 +201,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-gray-400 text-xs md:text-sm text-center">
-            © {new Date().getFullYear()} PWI Psychological. All Rights Reserved.
+            © {new Date().getFullYear()} MWI Psychological. All Rights Reserved.
           </p>
           
           <div className="flex gap-4 text-xs text-gray-400">
