@@ -3,7 +3,7 @@ const ApiError = require('../utils/ApiError');
 const Course = require('../models/Course');
 const StudentRegistration = require('../models/StudentRegistration');
 
-const MAX_COURSES = 2;
+
 
 const getCourses = asyncHandler(async (req, res) => {
   const courses = await Course.find().populate('teacher', 'fullName email').populate('students', 'fullName email');
@@ -20,12 +20,6 @@ const getAvailableCourses = asyncHandler(async (req, res) => {
 });
 
 const createCourse = asyncHandler(async (req, res) => {
-  const courseCount = await Course.countDocuments();
-
-  if (courseCount >= MAX_COURSES) {
-    throw new ApiError(400, 'Course limit reached. This project allows only two courses.');
-  }
-
   const course = await Course.create({ ...req.body, teacher: req.user._id });
   res.status(201).json({ success: true, message: 'Course created', data: course });
 });
