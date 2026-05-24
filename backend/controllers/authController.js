@@ -42,6 +42,7 @@ const login = asyncHandler(async (req, res) => {
     user: {
       id: user._id,
       fullName: user.fullName,
+      nic: user.nic || null,
       email: user.email,
       role: user.role,
       status: user.status,
@@ -188,6 +189,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     data: {
       id: user._id,
       fullName: user.fullName,
+      nic: user.nic || null,
       email: user.email,
       role: user.role,
       status: user.status,
