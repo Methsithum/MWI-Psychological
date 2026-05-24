@@ -325,15 +325,15 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
 
       {/* Admin Navbar - Mobile Responsive */}
-      <nav className="bg-gradient-to-r from-[#0B1F3A] to-[#1A3A5A] text-white sticky top-0 z-50 shadow-xl">
+      <nav className="bg-linear-to-r from-[#0B1F3A] to-[#1A3A5A] text-white sticky top-0 z-50 shadow-xl">
         <div className="max-w-8xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#D4AF37] to-[#C49B2C] rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-linear-to-br from-[#D4AF37] to-[#C49B2C] rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg">
                 <HiOutlineAcademicCap className="text-lg sm:text-2xl text-[#0B1F3A]" />
               </div>
               <div className="hidden sm:block">
@@ -395,7 +395,7 @@ const AdminDashboard = () => {
                 onClick={() => { setActiveTab('overview'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all duration-300 text-sm sm:text-base ${
                   activeTab === 'overview' 
-                    ? 'bg-gradient-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
+                    ? 'bg-linear-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
                     : 'text-gray-600 hover:bg-gray-50 hover:text-[#D4AF37]'
                 }`}
               >
@@ -407,7 +407,7 @@ const AdminDashboard = () => {
                 onClick={() => { setActiveTab('users'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all duration-300 text-sm sm:text-base ${
                   activeTab === 'users' 
-                    ? 'bg-gradient-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
+                    ? 'bg-linear-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
                     : 'text-gray-600 hover:bg-gray-50 hover:text-[#D4AF37]'
                 }`}
               >
@@ -424,7 +424,7 @@ const AdminDashboard = () => {
                 onClick={() => { setActiveTab('courses'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all duration-300 text-sm sm:text-base ${
                   activeTab === 'courses' 
-                    ? 'bg-gradient-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
+                    ? 'bg-linear-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
                     : 'text-gray-600 hover:bg-gray-50 hover:text-[#D4AF37]'
                 }`}
               >
@@ -436,7 +436,7 @@ const AdminDashboard = () => {
                 onClick={() => { setActiveTab('activities'); setMobileMenuOpen(false); }}
                 className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all duration-300 text-sm sm:text-base ${
                   activeTab === 'activities' 
-                    ? 'bg-gradient-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
+                    ? 'bg-linear-to-r from-[#D4AF37]/20 to-[#C49B2C]/10 text-[#0B1F3A] border-l-4 border-[#D4AF37]' 
                     : 'text-gray-600 hover:bg-gray-50 hover:text-[#D4AF37]'
                 }`}
               >
@@ -460,7 +460,7 @@ const AdminDashboard = () => {
               {/* Stats Cards - Responsive Grid */}
               <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
                 {stats.map((stat, idx) => (
-                  <div key={idx} className={`bg-gradient-to-r ${stat.color} rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1`}>
+                  <div key={idx} className={`bg-linear-to-r ${stat.color} rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-white/80 text-xs sm:text-sm">{stat.title}</p>
@@ -536,7 +536,7 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[500px]">
+                    <table className="w-full min-w-125">
                       <thead>
                         <tr className="border-b border-gray-200">
                           <th className="text-left p-2 sm:p-3 text-xs sm:text-sm font-semibold text-gray-600">Student</th>
