@@ -70,7 +70,7 @@ const AboutPage = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-5 leading-tight">
             About{' '}
             <span className="text-[#D4AF37] relative inline-block">
-              MWI Psychological
+              Director
               <svg className="absolute bottom-0 left-0 w-full h-2 md:h-3 text-[#D4AF37]/40" viewBox="0 0 200 10" preserveAspectRatio="none">
                 <path d="M0 5 Q 50 10 100 5 T 200 5" stroke="currentColor" fill="none" strokeWidth="2"/>
               </svg>
@@ -90,13 +90,13 @@ const AboutPage = () => {
             <div className="flex-1 order-2 lg:order-1">
               <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">Our Story</span>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#0B1F3A] mt-2 md:mt-3 mb-3 md:mb-5">
-                Newly Established Psychological Institute
+                 Established Psychological Institute
               </h2>
               <div className="w-12 h-0.5 bg-[#D4AF37] mb-4 md:mb-6"></div>
               
               <p className="text-sm md:text-base text-[#5A6A7A] leading-relaxed mb-3 md:mb-4">
-                MWI Psychological is a newly launched educational institute
-                dedicated to psychology, counselling, HRM, and behavioral development.
+                MWI Psychological is an educational institute committed to providing
+                 knowledge and training in psychology, counselling, HRM, and behavioral development.
               </p>
 
               <p className="text-sm md:text-base text-[#5A6A7A] leading-relaxed mb-3 md:mb-4">
@@ -187,7 +187,7 @@ const AboutPage = () => {
                 {/* Name - Desktop only */}
                 <div className="hidden lg:block mb-5">
                   <h3 className="text-2xl font-bold text-[#0B1F3A]">K.M. Imasha Isurune</h3>
-                  <p className="text-[#D4AF37] text-sm mt-1">Psychologist | Lecturer | Counsellor | Ayurvedic Therapist</p>
+                  <p className="text-[#D4AF37] text-sm mt-1">Psychology Lecturer | Counsellor | Ayurvedic Therapist</p>
                   <p className="text-gray-500 text-sm mt-1">ඉසුරුණී මුදලිගේ</p>
                   <div className="w-12 h-0.5 bg-[#D4AF37] mt-3"></div>
                 </div>

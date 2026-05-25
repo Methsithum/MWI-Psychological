@@ -8,6 +8,8 @@ import HowToApplyPage from './pages/Landing/HowToApplyPage';
 import ContactPage from './pages/Landing/ContactPage';
 import Coursepage from './pages/Landing/Coursepage';
 import Registerpage from './pages/Landing/Registerpage';
+import AboutMWI from './pages/Landing/AboutMWI';
+
 
 // Auth
 import SignInpage from './components/auth/SignInpage';
@@ -33,6 +35,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/courses" element={<Coursepage />} />
         <Route path="/register" element={<Registerpage />} />
+        <Route path="/about-mwi" element={<AboutMWI />} />
 
         {/* Auth — redirect to dashboard if already signed in */}
         <Route

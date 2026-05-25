@@ -12,14 +12,7 @@ const Footer = () => {
     { name: "Contact Us", path: "/contact" }
   ];
 
-  const programs = [
-    "Diploma in HRM & Behavioral Psychology",
-    "Diploma in Buddhist Counselling",
-    "Duration: 6 Months",
-    "Mode: Online Learning",
-    "Medium: Sinhala"
-  ];
-
+  
   return (
     <footer className="bg-[#0B1F3A] text-white relative overflow-hidden">
       {/* Decorative Top Gradient */}
@@ -113,22 +106,7 @@ const Footer = () => {
           </div>
 
           {/* Program Section */}
-          <div>
-            <h3 className="text-base md:text-lg font-semibold mb-5 text-[#D4AF37] flex items-center gap-2 justify-center sm:justify-start">
-              <span className="w-1 h-4 bg-[#D4AF37] rounded-full"></span>
-              Our Programs
-            </h3>
-            <ul className="space-y-2.5">
-              {programs.map((program, idx) => (
-                <li key={idx}>
-                  <span className="text-gray-300 text-sm flex items-center gap-2 justify-center sm:justify-start">
-                    <span className="text-[#D4AF37] text-xs">•</span>
-                    {program}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+         
 
           {/* Contact Section */}
           <div>

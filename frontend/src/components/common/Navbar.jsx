@@ -16,7 +16,6 @@ const Navbar = () => {
   const handleLogout = () => {
     auth.logout();
     setUser(null);
-    // reload to reset UI; alternatively use context/router
     window.location.href = '/';
   };
 
@@ -24,36 +23,35 @@ const Navbar = () => {
     <nav className="bg-white/90 backdrop-blur-md shadow-lg fixed w-full z-50 top-0 border-b border-[#D4AF37]/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-18">
-
-          {/* LOGO */}
-          <div className="flex items-center">
+          {/* LOGO - Pushed to extreme left corner */}
+          <div className="flex items-center -ml-4 sm:-ml-5 md:-ml-6">
             <Link to="/" className="flex items-center group">
               {/* Logo Image */}
-              <div className="w-10 h-10 md:w-15 md:h-15 relative space-y-5 mr-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 relative mr-2 sm:mr-3">
                 <img 
                   src={logo} 
-                  alt="PWI Psychological Logo"
-                  className="w-full h-full object-contain "
+                  alt="MWI Psychological Logo"
+                  className="w-full h-full object-contain"
                 />
               </div>
 
-              {/* Text Logo (fallback if image fails) */}
-              <div className="hidden sm:block">
-                <span className="font-bold text-lg md:text-xl text-[#0B1F3A] tracking-wide">
-                  MWI  මනෝවිද්‍යාත්මක ආයතනය
+              {/* Text Logo */}
+              <div className="block">
+                <span className="font-bold text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#0B1F3A] tracking-wide leading-tight whitespace-nowrap">
+                  MWI මනෝවිද්‍යාත්මක ආයතනය
                 </span>
-                <span className="block text-[10px] md:text-xs text-[#D4AF37] font-semibold tracking-wider uppercase">
+                <span className="hidden sm:block text-[8px] md:text-[10px] lg:text-xs text-[#D4AF37] font-semibold tracking-wider uppercase whitespace-nowrap">
                   Professional Diploma Programmes
                 </span>
               </div>
             </Link>
           </div>
 
-          {/* DESKTOP MENU */}
-          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+          {/* DESKTOP MENU - Centered */}
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
             <Link
               to="/"
-              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base"
+              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base whitespace-nowrap"
             >
               Home
               <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
@@ -61,15 +59,23 @@ const Navbar = () => {
 
             <Link
               to="/about"
-              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base"
+              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base whitespace-nowrap"
             >
-              About Lecturer
+              About Director
               <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
             </Link>
-
+            
+            <Link
+              to="/about-mwi"
+              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base whitespace-nowrap"
+            >
+              About MWI
+              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+            
             <Link
               to="/courses"
-              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base"
+              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base whitespace-nowrap"
             >
               Courses
               <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
@@ -77,7 +83,7 @@ const Navbar = () => {
 
             <Link
               to="/how-to-apply"
-              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base"
+              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base whitespace-nowrap"
             >
               How to Apply
               <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
@@ -85,40 +91,40 @@ const Navbar = () => {
 
             <Link
               to="/contact"
-              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base"
+              className="text-[#0B1F3A] hover:text-[#D4AF37] transition duration-300 font-medium relative group text-sm lg:text-base whitespace-nowrap"
             >
               Contact Us
               <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
             </Link>
           </div>
 
-          {/* AUTH BUTTONS - Modern Design */}
+          {/* AUTH BUTTONS - Modern Design - Hidden on mobile, visible on md and up */}
           <div className="hidden md:flex items-center space-x-3">
             {!user ? (
               <>
                 <Link to="/signin">
-                  <button className="px-5 py-2 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A] hover:text-amber-50 transition duration-300 font-medium text-sm">
+                  <button className="px-4 lg:px-5 py-2 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A] hover:text-amber-50 transition duration-300 font-medium text-sm whitespace-nowrap">
                     Sign In
                   </button>
                 </Link>
 
                 <Link to="/register">
-                  <button className="px-6 py-2 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg hover:scale-105 transform transition duration-300 font-bold text-sm">
+                  <button className="px-5 lg:px-6 py-2 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg hover:scale-105 transform transition duration-300 font-bold text-sm whitespace-nowrap">
                     Register Now
                   </button>
                 </Link>
               </>
             ) : (
               <div className="flex items-center gap-3">
-                <Link to="/dashboard" className="text-sm font-medium text-[#0B1F3A] hover:text-[#D4AF37]">
+                <Link to="/dashboard" className="text-sm font-medium text-[#0B1F3A] hover:text-[#D4AF37] truncate max-w-[120px]">
                   {user.fullName || user.email}
                 </Link>
-                <button onClick={handleLogout} className="px-4 py-2 text-sm bg-white border rounded-full hover:bg-[#F8F4EC]">Logout</button>
+                <button onClick={handleLogout} className="px-4 py-2 text-sm bg-white border rounded-full hover:bg-[#F8F4EC] whitespace-nowrap">Logout</button>
               </div>
             )}
           </div>
 
-          {/* MOBILE BUTTON */}
+          {/* MOBILE MENU BUTTON - Visible only on mobile */}
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -150,7 +156,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* MOBILE MENU - Modern Design */}
+        {/* MOBILE MENU - Modern Design - Visible when open */}
         {isOpen && (
           <div className="md:hidden pb-5 pt-2 border-t border-[#D4AF37]/20 animate-fadeIn">
             <div className="flex flex-col space-y-2 mt-3">
@@ -167,7 +173,15 @@ const Navbar = () => {
                 className="px-4 py-3 rounded-xl text-[#0B1F3A] hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-transparent hover:text-[#D4AF37] transition font-medium"
                 onClick={() => setIsOpen(false)}
               >
-                About Lecturer
+                About Director
+              </Link>
+
+              <Link
+                to="/about-mwi"
+                className="px-4 py-3 rounded-xl text-[#0B1F3A] hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-transparent hover:text-[#D4AF37] transition font-medium"
+                onClick={() => setIsOpen(false)}
+              >
+                About MWI
               </Link>
 
               <Link
@@ -195,23 +209,32 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* MOBILE BUTTONS */}
+            {/* MOBILE BUTTONS - Auth buttons for mobile */}
             <div className="pt-5 space-y-3">
-              <Link to="/signin" className="block" onClick={() => setIsOpen(false)}>
-                <button className="w-full px-4 py-3 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A]/5 transition duration-300 font-medium">
-                  Sign In
-                </button>
-              </Link>
-
               {!user ? (
-                <Link to="/register" className="block" onClick={() => setIsOpen(false)}>
-                  <button className="w-full px-4 py-3 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg transition duration-300 font-bold">
-                    Register Now
-                  </button>
-                </Link>
+                <>
+                  <Link to="/signin" className="block" onClick={() => setIsOpen(false)}>
+                    <button className="w-full px-4 py-3 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:border-[#0B1F3A] hover:bg-[#0B1F3A]/5 transition duration-300 font-medium">
+                      Sign In
+                    </button>
+                  </Link>
+
+                  <Link to="/register" className="block" onClick={() => setIsOpen(false)}>
+                    <button className="w-full px-4 py-3 bg-gradient-to-r from-[#D4AF37] to-[#C49B2C] text-[#0B1F3A] rounded-full hover:shadow-lg transition duration-300 font-bold">
+                      Register Now
+                    </button>
+                  </Link>
+                </>
               ) : (
-                <div className="px-4">
-                  <button onClick={handleLogout} className="w-full px-4 py-3 bg-white text-[#0B1F3A] rounded-full border">Logout</button>
+                <div className="px-4 space-y-3">
+                  <Link to="/dashboard" className="block" onClick={() => setIsOpen(false)}>
+                    <button className="w-full px-4 py-3 text-[#0B1F3A] border border-[#0B1F3A]/20 rounded-full hover:bg-[#D4AF37]/10 transition font-medium">
+                      Dashboard
+                    </button>
+                  </Link>
+                  <button onClick={handleLogout} className="w-full px-4 py-3 bg-white text-[#0B1F3A] rounded-full border hover:bg-red-50 hover:text-red-600 transition">
+                    Logout
+                  </button>
                 </div>
               )}
             </div>

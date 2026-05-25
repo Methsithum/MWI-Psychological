@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaTiktok, FaYoutube, FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
-import Navbar from '../../components/common/Navbar';
-import Footer from '../../components/common/Footer';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+  FaMapMarkerAlt,
+  FaEnvelope,
+  FaPhoneAlt,
+  FaWhatsapp,
+} from "react-icons/fa";
+import Navbar from "../../components/common/Navbar";
+import Footer from "../../components/common/Footer";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -18,29 +27,41 @@ const ContactPage = () => {
     e.preventDefault();
     setIsSubmitted(true);
     setTimeout(() => setIsSubmitted(false), 3000);
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    setFormData({ name: "", email: "", phone: "", message: "" });
   };
 
   const contactInfo = [
     {
       icon: <FaMapMarkerAlt className="text-3xl md:text-4xl" />,
       title: "Visit Us",
-      description: "MWI Psychological Learning Center, Colombo, Sri Lanka",
-      color: "from-[#0B1F3A] to-[#1A3A5A]"
+      description: (
+        <>
+          MWI Psychological Center
+          <br />
+          Angel Healthcare
+          <br />
+          2nd Floor
+          <br />
+          දළුගම, කැළණිය
+          <br />
+          කැළණිය විශ්වවිද්‍යාලය ඉදිරිපිට
+        </>
+      ),
+      color: "from-[#0B1F3A] to-[#1A3A5A]",
     },
     {
       icon: <FaEnvelope className="text-3xl md:text-4xl" />,
       title: "Email Us",
       description: "psychologicalinstitute351@gmail.com",
       link: "mailto:psychologicalinstitute351@gmail.com",
-      color: "from-[#D4AF37] to-[#C49B2C]"
+      color: "from-[#D4AF37] to-[#C49B2C]",
     },
     {
       icon: <FaPhoneAlt className="text-3xl md:text-4xl" />,
       title: "Call Us",
       description: "076 885 6172",
       link: "tel:0768856172",
-      color: "from-[#0B1F3A] to-[#1A3A5A]"
+      color: "from-[#0B1F3A] to-[#1A3A5A]",
     },
     {
       icon: <FaWhatsapp className="text-3xl md:text-4xl" />,
@@ -48,62 +69,63 @@ const ContactPage = () => {
       description: "076 885 6172",
       link: "https://wa.me/94768856172",
       color: "from-[#25D366] to-[#128C7E]",
-      isWhatsApp: true
-    }
+      isWhatsApp: true,
+    },
   ];
 
   const faqs = [
     {
       q: "When does the next batch start?",
-      a: "The next batch starts in January 2025 with limited seats available. Early registration is recommended."
+      a: "The next batch starts in January 2025 with limited seats available. Early registration is recommended.",
     },
     {
       q: "Is the diploma recognized?",
-      a: "Yes, we provide a professional diploma certificate upon successful completion of the program."
+      a: "Yes, we provide a professional diploma certificate upon successful completion of the program.",
     },
     {
       q: "Can I pay in installments?",
-      a: "Yes, we offer flexible payment plans including monthly installments. Contact us for details."
+      a: "Yes, we offer flexible payment plans including monthly installments. Contact us for details.",
     },
     {
       q: "Is it fully online?",
-      a: "Yes, the program is 100% online with live Zoom lectures, recordings, and online support."
+      a: "Yes, the program is 100% online with live Zoom lectures, recordings, and online support.",
     },
     {
       q: "What is the duration of the program?",
-      a: "Each diploma program is 6 months long with flexible learning schedules."
+      a: "Each diploma program is 6 months long with flexible learning schedules.",
     },
     {
       q: "Do I get study materials?",
-      a: "Yes, you will receive PDF notes, lecture recordings, and additional reference materials."
-    }
+      a: "Yes, you will receive PDF notes, lecture recordings, and additional reference materials.",
+    },
   ];
 
   const socialLinks = [
-    { 
-      icon: <FaFacebookF />, 
-      name: "Facebook", 
-      url: "https://www.facebook.com/share/1CjeFTX9Cu/?mibextid=wwXIfr", 
-      color: "hover:bg-[#1877f2]" 
-    },  { 
-      icon: <FaYoutube />, 
-      name: "YouTube", 
-      url: "https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX", 
-      color: "hover:bg-[#ff0000]" 
+    {
+      icon: <FaFacebookF />,
+      name: "Facebook",
+      url: "https://www.facebook.com/share/1CjeFTX9Cu/?mibextid=wwXIfr",
+      color: "hover:bg-[#1877f2]",
     },
-     { 
-      icon: <FaTiktok />, 
-      name: "TikTok", 
-      url: "https://www.tiktok.com/@mindfulwithisuruni", 
-      color: "hover:bg-[#da148e]" 
-    }, 
-   
-    { 
-      icon: <FaWhatsapp />, 
-      name: "WhatsApp", 
-      url: "https://wa.me/94768856172", 
-      color: "hover:bg-[#25D366]" 
-    }
+    {
+      icon: <FaYoutube />,
+      name: "YouTube",
+      url: "https://youtube.com/@mindfulwithisuruni?si=FUzCdlfb4njMhGiX",
+      color: "hover:bg-[#ff0000]",
+    },
+    {
+      icon: <FaTiktok />,
+      name: "TikTok",
+      url: "https://www.tiktok.com/@mindfulwithisuruni",
+      color: "hover:bg-[#da148e]",
+    },
+
+    {
+      icon: <FaWhatsapp />,
+      name: "WhatsApp",
+      url: "https://wa.me/94768856172",
+      color: "hover:bg-[#25D366]",
+    },
   ];
 
   return (
@@ -116,23 +138,34 @@ const ContactPage = () => {
           <div className="absolute top-20 left-10 w-48 h-48 md:w-72 md:h-72 bg-[#D4AF37] rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-56 h-56 md:w-96 md:h-96 bg-[#D4AF37] rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="relative max-w-5xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-[#D4AF37]/15 rounded-full mb-4 md:mb-6 backdrop-blur-sm">
             <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#D4AF37] rounded-full animate-pulse"></span>
-            <span className="text-xs md:text-sm font-medium text-[#D4AF37] tracking-wide">GET IN TOUCH</span>
+            <span className="text-xs md:text-sm font-medium text-[#D4AF37] tracking-wide">
+              GET IN TOUCH
+            </span>
           </div>
-          
+
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 md:mb-5 leading-tight">
-            Contact{' '}
+            Contact{" "}
             <span className="text-[#D4AF37] relative inline-block">
               Us
-              <svg className="absolute bottom-0 left-0 w-full h-2 md:h-3 text-[#D4AF37]/40" viewBox="0 0 200 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 10 100 5 T 200 5" stroke="currentColor" fill="none" strokeWidth="2"/>
+              <svg
+                className="absolute bottom-0 left-0 w-full h-2 md:h-3 text-[#D4AF37]/40"
+                viewBox="0 0 200 10"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0 5 Q 50 10 100 5 T 200 5"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeWidth="2"
+                />
               </svg>
             </span>
           </h1>
-          
+
           <p className="text-sm md:text-lg text-[#D1D8E0] max-w-2xl mx-auto">
             We're here to support your learning journey
           </p>
@@ -157,13 +190,12 @@ const ContactPage = () => {
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12">
-            
             {/* Contact Information Cards */}
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-[#0B1F3A] mb-6 md:mb-8">
                 Get in Touch
               </h2>
-              
+
               <div className="grid sm:grid-cols-2 gap-4 md:gap-5">
                 {contactInfo.map((item, i) => (
                   <div
@@ -171,10 +203,12 @@ const ContactPage = () => {
                     className={`group bg-gradient-to-br ${item.color} rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
                   >
                     <div className="mb-3">{item.icon}</div>
-                    <h3 className="font-semibold text-sm md:text-base mb-1">{item.title}</h3>
+                    <h3 className="font-semibold text-sm md:text-base mb-1">
+                      {item.title}
+                    </h3>
                     {item.link ? (
-                      <a 
-                        href={item.link} 
+                      <a
+                        href={item.link}
                         target={item.isWhatsApp ? "_blank" : "_self"}
                         rel={item.isWhatsApp ? "noopener noreferrer" : ""}
                         className="text-white/80 text-xs md:text-sm hover:text-white transition break-words flex items-center gap-1"
@@ -183,7 +217,9 @@ const ContactPage = () => {
                         {item.isWhatsApp && <span className="text-xs">↗</span>}
                       </a>
                     ) : (
-                      <p className="text-white/80 text-xs md:text-sm">{item.description}</p>
+                      <p className="text-white/80 text-xs md:text-sm">
+                        {item.description}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -228,47 +264,63 @@ const ContactPage = () => {
 
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Full Name *</label>
+                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">
+                    Full Name *
+                  </label>
                   <input
                     type="text"
                     placeholder="Your Name"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Email Address *</label>
+                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">
+                    Email Address *
+                  </label>
                   <input
                     type="email"
                     placeholder="your@email.com"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Phone Number</label>
+                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">
+                    Phone Number
+                  </label>
                   <input
                     type="tel"
                     placeholder="076 885 6172"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                     className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">Your Message *</label>
+                  <label className="block text-sm font-medium text-[#0B1F3A] mb-1">
+                    Your Message *
+                  </label>
                   <textarea
                     placeholder="Tell us about your inquiry..."
                     rows="4"
                     value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, message: e.target.value })
+                    }
                     className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition resize-none"
                     required
                   ></textarea>
@@ -292,33 +344,79 @@ const ContactPage = () => {
 
       {/* Map Section */}
       <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 md:mb-10">
-            <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">Location</span>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0B1F3A] mt-2">
-              Find Us Here
-            </h2>
-            <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-3"></div>
-          </div>
-          
-          <div className="bg-[#F8F4EC] rounded-2xl p-6 md:p-8 text-center">
-            <div className="w-full h-48 md:h-64 bg-gray-200 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#0B1F3A] to-[#1A3A5A]">
-              <div className="text-center text-white">
-                <FaMapMarkerAlt className="text-5xl mb-3 mx-auto" />
-                <p className="text-sm md:text-base">MWI Psychological Learning Center</p>
-                <p className="text-white/70 text-xs md:text-sm mt-1">Colombo, Sri Lanka</p>
-                <p className="text-[#D4AF37] text-xs mt-3">Interactive map coming soon</p>
-              </div>
-            </div>
-          </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-8 md:mb-10">
+      <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">
+        Location
+      </span>
+      <h2 className="text-2xl md:text-3xl font-bold text-[#0B1F3A] mt-2">
+        Find Us Here
+      </h2>
+      <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto mt-3"></div>
+    </div>
+
+    <div className="bg-[#F8F4EC] rounded-2xl p-6 md:p-8">
+      {/* Google Maps Embed - Correct Location */}
+      <div className="w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-lg">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3959.927103311662!2d79.909209!3d7.028037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae2f9c78e3c9e8b%3A0x6a2c9d9f8e4c0b1a!2sAngel%20Healthcare%20Dental%20-%20Dr.N.H.Karandeniya!5e0!3m2!1sen!2slk!4v1234567890123!5m2!1sen!2slk"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Angel Healthcare Dental Location Map"
+          className="rounded-xl"
+        ></iframe>
+      </div>
+
+      {/* Alternative: Direct Google Maps Link Button */}
+      <div className="mt-6 text-center">
+        <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+          <FaMapMarkerAlt className="text-[#D4AF37] text-lg" />
+          <span className="text-gray-700 text-sm">325 C, Kandy Road, Dalugama, Kelaniya 11600</span>
         </div>
-      </section>
+        
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
+          <a
+            href="https://www.google.com/maps/dir//Angel+Healthcare+Dental+-+Dr.N.H.Karandeniya,+325+C,+Kandy+Road,+Dalugama,+Kelaniya/@7.028037,79.909209,17z"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#D4AF37] text-[#0B1F3A] rounded-full font-semibold hover:bg-[#C49B2C] transition-all duration-300"
+          >
+            📍 Get Directions
+          </a>
+          <a
+            href="https://maps.app.goo.gl/pmgpZRqafsgAzLG49"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#D4AF37] text-[#D4AF37] rounded-full font-semibold hover:bg-[#D4AF37] hover:text-[#0B1F3A] transition-all duration-300"
+          >
+            🗺️ Open in Google Maps
+          </a>
+        </div>
+
+        {/* Business Hours */}
+        <div className="mt-4 pt-3 border-t border-[#D4AF37]/20">
+          <p className="text-gray-500 text-sm flex items-center justify-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span>Open Today: 9:30 AM – 7:30 PM</span>
+          </p>
+          <p className="text-gray-400 text-xs mt-2">📍 Angel Healthcare Dental, 325 C Kandy Road, Dalugama, Kelaniya</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* FAQ Section */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-[#F8F4EC] to-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 md:mb-12">
-            <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">FAQ</span>
+            <span className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#D4AF37] font-semibold">
+              FAQ
+            </span>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#0B1F3A] mt-2">
               Frequently Asked Questions
             </h2>
@@ -361,7 +459,7 @@ const ContactPage = () => {
             <circle cx="20" cy="20" r="1.5" fill="#D4AF37" />
           </svg>
         </div>
-        
+
         <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl md:rounded-3xl p-6 md:p-10 border border-white/20">
             <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-2 md:mb-4">
