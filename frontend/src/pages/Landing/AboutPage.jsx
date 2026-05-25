@@ -166,7 +166,7 @@ const AboutPage = () => {
               {/* Image Section */}
               <div className="lg:w-2/5 relative">
                 <div 
-                  className="h-80 md:h-96 lg:h-full w-full bg-cover bg-center"
+                  className="h-100 md:h-96 lg:h-full w-full bg-cover bg-center"
                   style={{ backgroundImage: `url(${lecturerImage})` }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-l-2xl"></div>
